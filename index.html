@@ -4483,7 +4483,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if(window.AppState.draft.items.length === 0) return window.showToast("Add at least one product.", "error");
             
             const lockDate = window.AppState.settings.lockDate;
-            const invDate = new Date().toISOString().split('T')[0];
+            // FIX: Use draft.date (backdate) if set, otherwise fallback to today
+            const invDate = window.AppState.draft.date || new Date().toISOString().split('T')[0];
             if(lockDate && new Date(invDate) < new Date(lockDate)) return window.showToast(`Cannot generate before FY Lock Date: ${lockDate}`, "error");
 
             // Feature 2: Override status if Credit mode
