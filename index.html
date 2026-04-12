@@ -4504,8 +4504,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const splitData = window.AppState.draft.splitPayment || null;
             const invoiceDoc = { ...window.AppState.draft, client: clientData, status: status, subtotal: totals.subtotal, totalTax: totals.totalTax, grandTotal: totals.grandTotal, tdsAmount: totals.tdsCalculated, date: invDate, isDeleted: false, createdAt: Date.now(), ...(splitData ? { splitPayment: splitData } : {}) };
 
-            try {
-                await setDoc(doc(db, 'artifacts', appId, 'users', window.AppState.user.uid, 'invoices', invoiceDoc.id), invoiceDoc);
+try {
+                    // Check for duplicate ID if feature is NOT enabled
+                    if (!window.isFeatureEnabled('allowDuplicateInvId')) {
+                        const exists = window.AppState.invoices.find(i => i.id === invoiceDoc.id && !i.isDeleted);
+                        if (exists) return window.showToast("Invoice ID " + invoiceDoc.id + " already exists. Please use a unique ID or enable 'Allow Duplicate Invoice ID' in Active Modules.", "error");
+                    }
+	                await setDoc(doc(db, 'artifacts', appId, 'users', window.AppState.user.uid, 'invoices', invoiceDoc.id), invoiceDoc);
                 const existingClient = window.AppState.clients.find(c => c.name.toLowerCase() === name.toLowerCase());
                 if(existingClient) { await updateDoc(doc(db, 'artifacts', appId, 'users', window.AppState.user.uid, 'clients', existingClient.id), clientData); } 
                 else { await addDoc(collection(db, 'artifacts', appId, 'users', window.AppState.user.uid, 'clients'), { ...clientData, journal: [], isDeleted: false, createdAt: serverTimestamp() }); }
@@ -7012,19 +7017,21 @@ var _settingsModals = {
         ['barcodeScannerFeature','Barcode Scanner on Invoice'],
         ['aiPriceSuggestion','AI Price Suggestion'],
         ['recurringInvoices','Recurring / Subscription Invoices'],
-        ['digitalQROnInvoice','Digital QR Code on Invoice PDF']
-      ];
+['digitalQROnInvoice','Digital QR Code on Invoice PDF'],
+        ['allowDuplicateInvId','Allow Duplicate Invoice ID']
+	      ];
       return '<div class="space-y-2">' + list.map(function(f){
-        var isNew = ['waQRLink','barcodeScannerFeature','aiPriceSuggestion','recurringInvoices','digitalQROnInvoice','autoCreateClient','autoCreateProduct'].includes(f[0]);
+        var isNew = ['waQRLink','barcodeScannerFeature','aiPriceSuggestion','recurringInvoices','digitalQROnInvoice','autoCreateClient','autoCreateProduct','allowDuplicateInvId'].includes(f[0]);
         var checked = feats[f[0]] !== false;
         var note = f[0]==='waQRLink' ? '<div class="text-xs text-emerald-600">Adds scannable invoice link in WhatsApp message</div>' :
-                   f[0]==='digitalQROnInvoice' ? '<div class="text-xs text-emerald-600">Show QR code on printed invoice for digital copy</div>' : '';
+                   f[0]==='digitalQROnInvoice' ? '<div class="text-xs text-emerald-600">Show QR code on printed invoice for digital copy</div>' : 
+                   f[0]==='allowDuplicateInvId' ? '<div class="text-xs text-amber-600">When ON: allows saving multiple invoices with same ID</div>' : '';
         return `<label class="toggle-row flex-col items-start gap-0.5"><div class="flex items-center gap-2 w-full"><label class="toggle" onclick="event.stopPropagation()"><input type="checkbox" data-feat="${f[0]}" id="smod-feat-${f[0]}" ${checked?'checked':''}><span class="toggle-track"></span></label><span class="text-sm font-medium text-slate-700">${f[1]}${isNew?' <span class="text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-bold ml-1">NEW</span>':''}</span></div>${note}</label>`;
       }).join('') + '</div>';
     },
     save: function() {
       var feats = Object.assign({}, (window.AppState&&window.AppState.settings&&window.AppState.settings.features)||{});
-      ['expenses','multiDoc','currency','shipping','tds','rcm','hsn','dueDate','ledger','creditNote','margin','batch','deleteBtn','stamp','returnStock','autoCreateClient','autoCreateProduct','waQRLink','barcodeScannerFeature','aiPriceSuggestion','recurringInvoices','digitalQROnInvoice'].forEach(function(k){
+      ['expenses','multiDoc','currency','shipping','tds','rcm','hsn','dueDate','ledger','creditNote','margin','batch','deleteBtn','stamp','returnStock','autoCreateClient','autoCreateProduct','waQRLink','barcodeScannerFeature','aiPriceSuggestion','recurringInvoices','digitalQROnInvoice','allowDuplicateInvId'].forEach(function(k){
         var el = document.getElementById('smod-feat-'+k);
         if(el) {
           feats[k] = el.checked;
@@ -10613,8 +10620,9 @@ window._buildRecordActions = function(inv) {
     var menuItems = [
         { label:'📋 Duplicate', fn:'window.duplicateInvoice(\''+id+'\')' },
         { label:'📲 WhatsApp', fn:'window.shareWhatsApp(\''+id+'\')' },
-        { label:'🚫 Void', fn:'window.voidInvoice(\''+id+'\')' },
-    ];
+{ label:'🚫 Void', fn:'window.voidInvoice(\''+id+'\')' },
+        { label:'✏️ Edit No/Date', fn:'window.openEditInvoiceModal(\''+id+'\')' },
+	    ];
     if(window.isFeatureEnabled('creditNote')) menuItems.push({ label:'📝 Credit Note', fn:'window.issueCreditNote(\''+id+'\')' });
 
     var menuHTML = menuItems.map(function(m){
