@@ -4631,7 +4631,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const collectedTax = filtered.filter(i => i.status === 'final' && i.docType === 'Tax Invoice' && i.status !== 'void').reduce((sum, i) => sum + (Number(i.totalTax) || 0), 0);
             setText('records-tax-summary', formatINR(collectedTax));
 
-            setHTML('records-list', filtered.map(inv => `<tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors bg-white ${inv.status==='void'?'opacity-50':''}"><td class="p-4 font-mono text-emerald-700 text-sm ${inv.status==='void'?'line-through':''}">${inv.id}</td><td class="p-4 text-xs font-bold text-slate-500 uppercase">${inv.docType || 'Tax Invoice'}</td><td class="p-4 text-slate-600 text-sm whitespace-nowrap">${inv.date}</td><td class="p-4 font-medium text-slate-800 text-sm truncate max-w-[150px]">${inv.client.name}</td><td class="p-4 text-right font-bold ${inv.docType === 'Credit Note' ? 'text-red-600' : 'text-slate-800'} ${inv.status==='void'?'line-through text-slate-400':''}">${window.formatCurrency(inv.grandTotal, inv.currency)}</td><td class="p-4 text-center">${inv.status === 'draft' || inv.docType === 'Credit Note' || inv.status === 'void' ? `<span class="text-[10px] text-slate-400 font-bold uppercase">${inv.status==='void'?'VOID':'N/A'}</span>` : `<button onclick="window.togglePaymentStatus('${inv.id}', '${inv.paymentStatus || 'unpaid'}')" class="text-[10px] uppercase font-bold px-3 py-1.5 rounded-full transition-colors ${inv.paymentStatus === 'paid' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 shadow-sm' : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'}">${inv.paymentStatus === 'paid' ? 'Paid' : 'Unpaid'}</button>`}</td><td class="p-4 text-center">${inv.status === 'draft' ? `<div class="flex items-center gap-1 justify-center"><button onclick="window.resumeDraft('${inv.id}')" class="px-2 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 rounded text-xs font-bold transition-colors">Resume</button>${window.isFeatureEnabled('deleteBtn') ? `<button onclick="window.softDeleteInvoice('${inv.id}')" class="p-1.5 text-slate-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>` : `<div class="flex items-center gap-1 justify-center"><button onclick="window.viewInvoice('${inv.id}')" class="px-2 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 rounded text-xs font-bold transition-colors">View</button><button onclick="window.duplicateInvoice('${inv.id}')" title="Duplicate" class="p-1.5 text-slate-400 hover:text-blue-500"><i data-lucide="copy" class="w-4 h-4"></i></button><button onclick="window.shareWhatsApp('${inv.id}')" title="WhatsApp" class="p-1.5 text-slate-400 hover:text-green-500"><i data-lucide="message-circle" class="w-4 h-4"></i></button><button onclick="window.voidInvoice('${inv.id}')" title="Void" class="p-1.5 text-slate-400 hover:text-red-500"><i data-lucide="ban" class="w-4 h-4"></i></button>${window.isFeatureEnabled('creditNote') ? `<button onclick="window.issueCreditNote('${inv.id}')" title="Credit Note" class="p-1.5 text-slate-400 hover:text-purple-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path></svg></button>`:''}${window.isFeatureEnabled('deleteBtn') ? `<button onclick="window.softDeleteInvoice('${inv.id}')" title="Delete" class="p-1.5 text-slate-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>`}</td></tr>`).join('') || '<tr><td colspan="7" class="p-8 text-center text-slate-400">No records found matching filters.</td></tr>');
+            setHTML('records-list', filtered.map(inv => `<tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors bg-white ${inv.status==='void'?'opacity-50':''}"><td class="p-4 font-mono text-emerald-700 text-sm ${inv.status==='void'?'line-through':''}">${inv.id}</td><td class="p-4 text-xs font-bold text-slate-500 uppercase">${inv.docType || 'Tax Invoice'}</td><td class="p-4 text-slate-600 text-sm whitespace-nowrap">${inv.date}</td><td class="p-4 font-medium text-slate-800 text-sm truncate max-w-[150px]">${inv.client.name}</td><td class="p-4 text-right font-bold ${inv.docType === 'Credit Note' ? 'text-red-600' : 'text-slate-800'} ${inv.status==='void'?'line-through text-slate-400':''}">${window.formatCurrency(inv.grandTotal, inv.currency)}</td><td class="p-4 text-center">${inv.status === 'draft' || inv.docType === 'Credit Note' || inv.status === 'void' ? `<span class="text-[10px] text-slate-400 font-bold uppercase">${inv.status==='void'?'VOID':'N/A'}</span>` : `<button onclick="window.togglePaymentStatus('${inv.id}', '${inv.paymentStatus || 'unpaid'}')" class="text-[10px] uppercase font-bold px-3 py-1.5 rounded-full transition-colors ${inv.paymentStatus === 'paid' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 shadow-sm' : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'}">${inv.paymentStatus === 'paid' ? 'Paid' : 'Unpaid'}</button>`}</td><td class="p-4 text-center">${inv.status === 'draft' ? `<div class="flex items-center gap-1 justify-center"><button onclick="window.resumeDraft('${inv.id}')" class="px-2 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 rounded text-xs font-bold transition-colors">Resume</button>${window.isFeatureEnabled('deleteBtn') ? `<button onclick="window.softDeleteInvoice('${inv.id}')" class="p-1.5 text-slate-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>` : `<div class="flex items-center gap-1 justify-center"><button onclick="window.viewInvoice('${inv.id}')" class="px-2 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 rounded text-xs font-bold transition-colors">View</button><button onclick="window.duplicateInvoice('${inv.id}')" title="Duplicate" class="p-1.5 text-slate-400 hover:text-blue-500"><i data-lucide="copy" class="w-4 h-4"></i></button><button onclick="window.shareWhatsApp('${inv.id}')" title="WhatsApp" class="p-1.5 text-slate-400 hover:text-green-500"><i data-lucide="message-circle" class="w-4 h-4"></i></button><button onclick="window.openEditInvoiceModal('${inv.id}')" title="Edit Invoice No/Date" class="p-1.5 text-slate-400 hover:text-emerald-600"><i data-lucide="edit-3" class="w-4 h-4"></i></button><button onclick="window.voidInvoice('${inv.id}')" title="Void" class="p-1.5 text-slate-400 hover:text-red-500"><i data-lucide="ban" class="w-4 h-4"></i></button>${window.isFeatureEnabled('creditNote') ? `<button onclick="window.issueCreditNote('${inv.id}')" title="Credit Note" class="p-1.5 text-slate-400 hover:text-purple-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path></svg></button>`:''}${window.isFeatureEnabled('deleteBtn') ? `<button onclick="window.softDeleteInvoice('${inv.id}')" title="Delete" class="p-1.5 text-slate-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>`}</td></tr>`).join('') || '<tr><td colspan="7" class="p-8 text-center text-slate-400">No records found matching filters.</td></tr>');
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
@@ -12862,3 +12862,108 @@ window.resetInvCounter = function() {
 
 console.log('Final fixes loaded ✅');
 </script>
+
+<!-- Edit Invoice Modal -->
+<div id="edit-invoice-modal" class="modal" onclick="if(event.target===this)document.getElementById('edit-invoice-modal').classList.remove('open')">
+  <div class="modal-box max-w-md">
+    <div class="modal-head">
+      <h3 class="text-lg font-bold text-slate-800">Edit Invoice Details</h3>
+      <button onclick="document.getElementById('edit-invoice-modal').classList.remove('open')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+    </div>
+    <div class="modal-body space-y-4">
+      <div>
+        <label class="lbl">Invoice Number</label>
+        <input type="text" id="edit-inv-id" class="inp" placeholder="Enter new invoice number">
+        <p class="text-[10px] text-slate-400 mt-1">Changing the ID will update the document reference.</p>
+      </div>
+      <div>
+        <label class="lbl">Invoice Date</label>
+        <input type="date" id="edit-inv-date" class="inp">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button onclick="document.getElementById('edit-invoice-modal').classList.remove('open')" class="btn btn-ghost">Cancel</button>
+      <button id="btn-save-invoice-edit" class="btn btn-primary">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+    window.openEditInvoiceModal = function(id) {
+        const inv = window.AppState.invoices.find(i => i.id === id);
+        if (!inv) return window.showToast("Invoice not found", "error");
+        
+        document.getElementById('edit-inv-id').value = inv.id;
+        document.getElementById('edit-inv-date').value = inv.date;
+        
+        const saveBtn = document.getElementById('btn-save-invoice-edit');
+        saveBtn.onclick = () => window.saveInvoiceEdit(id);
+        
+        document.getElementById('edit-invoice-modal').classList.add('open');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    };
+
+    window.saveInvoiceEdit = async function(oldId) {
+        const newId = document.getElementById('edit-inv-id').value.trim();
+        const newDate = document.getElementById('edit-inv-date').value;
+        
+        if (!newId) return window.showToast("Invoice ID cannot be empty", "error");
+        if (!newDate) return window.showToast("Date cannot be empty", "error");
+
+        const inv = window.AppState.invoices.find(i => i.id === oldId);
+        if (!inv) return window.showToast("Original invoice not found", "error");
+
+        const saveBtn = document.getElementById('btn-save-invoice-edit');
+        const originalText = saveBtn.innerHTML;
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        try {
+            const { db, appId, doc, setDoc, deleteDoc, updateDoc } = window._getFirestoreRef();
+            const uid = window.AppState.user.uid;
+            const userInvoicesPath = ['artifacts', appId, 'users', uid, 'invoices'];
+
+            if (newId !== oldId) {
+                // Check if new ID already exists
+                const exists = window.AppState.invoices.find(i => i.id === newId);
+                if (exists) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = originalText;
+                    return window.showToast("Invoice ID " + newId + " already exists", "error");
+                }
+
+                // Create new doc and delete old one
+                const newData = { ...inv, id: newId, date: newDate, updatedAt: Date.now() };
+                delete newData.id_old; // clean up if any
+                
+                await setDoc(doc(db, ...userInvoicesPath, newId), newData);
+                await deleteDoc(doc(db, ...userInvoicesPath, oldId));
+                
+                // Update local state immediately for better UX
+                window.AppState.invoices = window.AppState.invoices.map(i => i.id === oldId ? newData : i);
+            } else {
+                // Just update date
+                await updateDoc(doc(db, ...userInvoicesPath, oldId), { date: newDate, updatedAt: Date.now() });
+                window.AppState.invoices = window.AppState.invoices.map(i => i.id === oldId ? { ...i, date: newDate } : i);
+            }
+
+            window.showToast("Invoice updated successfully");
+            document.getElementById('edit-invoice-modal').classList.remove('open');
+            if (window.renderRecords) window.renderRecords();
+            if (window.updateDashboard) window.updateDashboard();
+            
+        } catch (e) {
+            console.error("Error updating invoice:", e);
+            window.showToast("Failed to update invoice: " + e.message, "error");
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = originalText;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+    };
+})();
+</script>
+</body>
+</html>
