@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>My Business ERP</title>
+<title>Dev Ayurveda ERP</title>
 <meta name="theme-color" content="#059669">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2484,79 +2484,33 @@ async function shareInvoiceWA() {
 // ── PDF CORE: Generate as Blob (NOT data: URI — Android rejects data: URIs)
 async function generatePDFBlob(element, filename) {
     if(!element || typeof html2pdf === 'undefined') return null;
-
-    // ── KEY FIX: Reset zoom/transform before capture ──────────
-    // scaleInv() sets CSS zoom (e.g. 0.49 on mobile) which makes PDF tiny.
-    // We reset to 1, capture at full A4 size, then restore.
-    var savedZoom      = element.style.zoom;
-    var savedTransform = element.style.transform;
-    var savedWidth     = element.style.width;
-    var savedMinH      = element.style.minHeight;
-
-    element.style.zoom      = '1';
-    element.style.transform = 'none';
-    element.style.width     = '794px';   // force full A4 width
-    element.style.minHeight = '1123px';  // force full A4 height
-
-    // Let browser repaint with new styles
-    await new Promise(function(r){ requestAnimationFrame(function(){ requestAnimationFrame(r); }); });
-
     try {
         var blob = await html2pdf().set({
             margin: 0,
             filename: filename || 'invoice.pdf',
-            image: { type: 'jpeg', quality: 0.95 },
-            html2canvas: {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                allowTaint: true,
-                backgroundColor: '#ffffff',
-                windowWidth: 794,
-                width: 794,
-                scrollX: 0,
-                scrollY: 0
-            },
+            image: { type: 'jpeg', quality: 0.92 },
+            html2canvas: { scale: 2, useCORS: true, logging: false, allowTaint: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         }).from(element).output('blob');
         return blob;
     } catch(e) {
         console.error('PDF blob error:', e);
         return null;
-    } finally {
-        // ── Always restore original zoom/styles ───────────────
-        element.style.zoom      = savedZoom;
-        element.style.transform = savedTransform;
-        element.style.width     = savedWidth;
-        element.style.minHeight = savedMinH;
-        // Re-apply fit zoom for screen display
-        if(typeof scaleInv === 'function') scaleInv();
     }
 }
 
 // Kept for WhatsApp base64 share
 async function generatePDFBase64(element, filename) {
     if(!element || typeof html2pdf === 'undefined') return null;
-    var savedZoom = element.style.zoom;
-    var savedTransform = element.style.transform;
-    element.style.zoom = '1';
-    element.style.transform = 'none';
-    element.style.width = '794px';
-    await new Promise(function(r){ requestAnimationFrame(function(){ requestAnimationFrame(r); }); });
     try {
         return await html2pdf().set({
             margin: 0,
             filename: filename || 'invoice.pdf',
-            image: { type: 'jpeg', quality: 0.95 },
-            html2canvas: { scale: 2, useCORS: true, logging: false, allowTaint: true, backgroundColor: '#ffffff', windowWidth: 794, width: 794 },
+            image: { type: 'jpeg', quality: 0.92 },
+            html2canvas: { scale: 2, useCORS: true, logging: false, allowTaint: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
         }).from(element).output('datauristring');
     } catch(e) { return null; }
-    finally {
-        element.style.zoom = savedZoom;
-        element.style.transform = savedTransform;
-        if(typeof scaleInv === 'function') scaleInv();
-    }
 }
 
 // ── UNIVERSAL DOWNLOAD using Blob → object URL (NOT data: URI)
@@ -2623,24 +2577,18 @@ async function downloadPDFBlob(blob, filename) {
 // ── DOWNLOAD PDF ──
 window.downloadPDF = async function() {
     var element = document.getElementById('invoice-render-area');
-    if(!element) { window.showToast && window.showToast('Invoice not open','error'); return; }
+    if(!element) return;
+    var invEl = element.querySelector('.inv-id-tracker');
+    var invId = invEl ? (invEl.dataset.id || 'invoice') : 'invoice';
 
-    // Get invoice ID from multiple possible sources
-    var invEl = element.querySelector('.inv-id-tracker,[data-id],[data-inv-id]');
-    var invId = (invEl && (invEl.dataset.id || invEl.dataset.invId || invEl.textContent.trim())) 
-                || window._curInvId 
-                || window._currentViewInvoiceId 
-                || 'invoice';
-    invId = String(invId).trim() || 'invoice';
-
-    window.showToast && window.showToast('Generating PDF...');
+    window.showToast && window.showToast('PDF बन रही है...');
     var blob = await generatePDFBlob(element, invId + '.pdf');
-    if(!blob || blob.size < 3000) {
-        window.showToast && window.showToast('PDF error! Try again.', 'error');
+    if(!blob) {
+        window.showToast && window.showToast('PDF error!', 'error');
         return;
     }
     await downloadPDFBlob(blob, invId + '.pdf');
-    window.showToast && window.showToast('✅ PDF downloaded!');
+    window.showToast && window.showToast('PDF downloaded! ✅');
 };
 
 // ── WHATSAPP SHARE ──
@@ -2650,7 +2598,7 @@ async function shareInvoiceWA() {
     var inv = window.AppState && window.AppState.invoices.find(function(i){ return i.id === id; });
     if(!inv) return;
 
-    var biz = (window.AppState.settings && window.AppState.settings.businessName) || 'My Business ';
+    var biz = (window.AppState.settings && window.AppState.settings.businessName) || 'Dev Ayurveda ';
     var fmt = window.formatCurrency || function(a){ return '₹' + Number(a).toFixed(2); };
     var msg = '🌿 *' + biz + '*'
         + '\n\nHello ' + inv.client.name + ','
@@ -2685,7 +2633,7 @@ async function shareInvoiceWA() {
 
     // Step 2: Open WhatsApp with text + download PDF
     var waUrl = 'https://wa.me/' + (num || '') + '?text=' + encodeURIComponent(msg);
-    window.open(waUrl, '_blank');  // open in new tab — don't navigate away
+    window.location.href = waUrl;
 
     // Download PDF after short delay
     if(area) {
@@ -6226,21 +6174,24 @@ window.downloadPreviewPDF = async function() {
     var inv = window._previewInvData || (window.AppState && window.AppState.draft);
     if(!inv) { window.showToast && window.showToast('No invoice data', 'error'); return; }
     window.showToast && window.showToast('Generating PDF...');
+    var filename = (inv.id || 'preview') + '.pdf';
+    // Use opacity:0.001 NOT left:-9999px — Android WebView won't render off-viewport elements
     var freshDiv = document.createElement('div');
-    freshDiv.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;min-height:1123px;background:white;font-size:11px;padding:30px 36px;box-sizing:border-box;z-index:-999;overflow:visible;';
-    freshDiv.innerHTML = window.generateInvoiceHTML ? window.generateInvoiceHTML(inv) : document.getElementById('preview-render-area').innerHTML;
-    freshDiv.style.transform = 'none';
+    freshDiv.style.cssText = 'position:fixed;top:0;left:0;width:794px;min-height:1123px;background:white;font-size:11px;padding:30px 36px;box-sizing:border-box;z-index:9997;overflow:visible;opacity:0.001;pointer-events:none;';
+    freshDiv.innerHTML = window.generateInvoiceHTML ? window.generateInvoiceHTML(inv) : (document.getElementById('preview-render-area')||{}).innerHTML || '';
+    var savedScroll = window.pageYOffset || 0;
+    window.scrollTo(0, 0);
     document.body.appendChild(freshDiv);
-    await new Promise(function(r){ setTimeout(r, 300); });
+    await new Promise(function(r){ setTimeout(r, 400); });
     try {
-        var filename = (inv.id || 'preview') + '.pdf';
         var blob = await html2pdf().set({
-            margin: 10, filename: filename,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, logging: false, allowTaint: true, backgroundColor: '#ffffff', windowWidth: 1000, width: 1000, letterRendering: true },
+            margin: 0, filename: filename,
+            image: { type: 'jpeg', quality: 0.95 },
+            html2canvas: { scale: 2, useCORS: true, logging: false, allowTaint: true, backgroundColor: '#ffffff', windowWidth: 794, width: 794, scrollX: 0, scrollY: 0 },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        }).from(freshDiv).toPdf().get('pdf').then(function(pdf){ return pdf.output('blob'); });
+        }).from(freshDiv).output('blob');
         if(freshDiv.parentNode) document.body.removeChild(freshDiv);
+        window.scrollTo(0, savedScroll);
         if(!blob || blob.size < 1000) { window.showToast && window.showToast('PDF error!', 'error'); return; }
         if(window.downloadPDFBlob) { await window.downloadPDFBlob(blob, filename); }
         else {
@@ -6252,6 +6203,7 @@ window.downloadPreviewPDF = async function() {
         window.showToast && window.showToast('PDF downloaded! ✅');
     } catch(e) {
         if(freshDiv.parentNode) document.body.removeChild(freshDiv);
+        window.scrollTo(0, savedScroll);
         window.showToast && window.showToast('PDF error: ' + e.message, 'error');
     }
 };
@@ -6276,20 +6228,23 @@ window.sharePreviewWA = async function() {
         return;
     }
     window.showToast && window.showToast('Generating PDF for WhatsApp...');
+    var filename = (inv.id || 'invoice') + '.pdf';
     var freshDiv = document.createElement('div');
-    freshDiv.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;min-height:1123px;background:white;font-size:11px;padding:30px 36px;box-sizing:border-box;z-index:-999;overflow:visible;';
-    freshDiv.innerHTML = window.generateInvoiceHTML ? window.generateInvoiceHTML(inv) : document.getElementById('preview-render-area').innerHTML;
+    freshDiv.style.cssText = 'position:fixed;top:0;left:0;width:794px;min-height:1123px;background:white;font-size:11px;padding:30px 36px;box-sizing:border-box;z-index:9997;overflow:visible;opacity:0.001;pointer-events:none;';
+    freshDiv.innerHTML = window.generateInvoiceHTML ? window.generateInvoiceHTML(inv) : (document.getElementById('preview-render-area')||{}).innerHTML || '';
+    var savedScroll2 = window.pageYOffset || 0;
+    window.scrollTo(0, 0);
     document.body.appendChild(freshDiv);
-    await new Promise(function(r){ setTimeout(r, 300); });
+    await new Promise(function(r){ setTimeout(r, 400); });
     try {
-        var filename = (inv.id || 'invoice') + '.pdf';
         var pdfBlob = await html2pdf().set({
-            margin: 10, filename: filename,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, logging: false, allowTaint: true, backgroundColor: '#ffffff', windowWidth: 1000, width: 1000, letterRendering: true },
+            margin: 0, filename: filename,
+            image: { type: 'jpeg', quality: 0.95 },
+            html2canvas: { scale: 2, useCORS: true, logging: false, allowTaint: true, backgroundColor: '#ffffff', windowWidth: 794, width: 794, scrollX: 0, scrollY: 0 },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        }).from(freshDiv).toPdf().get('pdf').then(function(pdf){ return pdf.output('blob'); });
+        }).from(freshDiv).output('blob');
         if(freshDiv.parentNode) document.body.removeChild(freshDiv);
+        window.scrollTo(0, savedScroll2);
         var file = new File([pdfBlob], filename, { type: 'application/pdf' });
         if(navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
             await navigator.share({ files: [file], text: msg });
@@ -6300,6 +6255,7 @@ window.sharePreviewWA = async function() {
         }
     } catch(e) {
         if(freshDiv.parentNode) document.body.removeChild(freshDiv);
+        window.scrollTo(0, savedScroll2);
         window.open('https://wa.me/' + (num || '') + '?text=' + encodeURIComponent(msg), '_blank');
     }
 };
@@ -7612,7 +7568,7 @@ window.autoSendWAInvoice = async function() {
 
     // Try to render invoice and share as PDF
     var tempDiv = document.createElement('div');
-    tempDiv.style.cssText = 'position:fixed;left:-9999px;top:0;width:210mm;background:white;';
+    tempDiv.style.cssText = 'position:fixed;top:0;left:0;width:794px;min-height:1123px;background:white;opacity:0.001;pointer-events:none;z-index:9997;box-sizing:border-box;';
     if(window.generateInvoiceHTML) tempDiv.innerHTML = window.generateInvoiceHTML(latest);
     document.body.appendChild(tempDiv);
 
@@ -11951,7 +11907,7 @@ ${unpaidAmt > totalRev*0.3 ? '<div style="background:#fef3c7;border:1px solid #f
 
     var tempDiv = document.createElement('div');
     tempDiv.innerHTML = reportHTML;
-    tempDiv.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:white;z-index:-999;';
+    tempDiv.style.cssText = 'position:fixed;top:0;left:0;width:794px;background:white;opacity:0.001;pointer-events:none;z-index:9997;box-sizing:border-box;';
     document.body.appendChild(tempDiv);
     await new Promise(function(r){ setTimeout(r, 500); });
 
@@ -12971,6 +12927,247 @@ console.log('Final fixes loaded ✅');
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
     };
+})();
+</script>
+
+<!-- ================================================================
+     PDF RENDER FIX v3
+     Root cause of blank PDFs: Android WebView does NOT render elements
+     placed at left:-9999px (position:fixed or absolute) or with
+     visibility:hidden. html2canvas captures only what the browser
+     actually paints in the viewport area.
+
+     Correct approach:
+     1. Single PDF  → Reset zoom/transform directly on invoice-render-area,
+                       capture it, then restore. Element stays in-viewport.
+     2. Bulk PDF    → Stack pages in a container with opacity:0.001 (NOT
+                       hidden/visibility:hidden) placed at top:0 left:0,
+                       scroll to top, capture, restore scroll.
+     3. WA Share    → Same as single PDF.
+================================================================ -->
+<script>
+(function() {
+    'use strict';
+
+    // ════════════════════════════════════════════════════════════
+    // FIX 1 — Single invoice PDF: reset zoom on live element
+    // ════════════════════════════════════════════════════════════
+    function applyDownloadPDFFix() {
+        if(window.downloadPDF && window.downloadPDF._v3fix) return;
+        window.downloadPDF = async function() {
+            var element = document.getElementById('invoice-render-area');
+            if(!element) { window.showToast && window.showToast('Invoice खोलें पहले', 'error'); return; }
+            var invEl = element.querySelector('.inv-id-tracker');
+            var invId = (invEl && (invEl.dataset.id || invEl.textContent.trim())) || window._curInvId || window._currentViewInvoiceId || 'invoice';
+            invId = String(invId).trim() || 'invoice';
+
+            // ── Save current zoom state ──
+            var savedZoom      = element.style.zoom      || '';
+            var savedTransform = element.style.transform || '';
+            var savedWidth     = element.style.width     || '';
+            var savedMinH      = element.style.minHeight || '';
+            var savedMaxW      = element.style.maxWidth  || '';
+
+            // ── Force full A4 size, remove zoom ──
+            element.style.zoom      = '1';
+            element.style.transform = 'none';
+            element.style.width     = '794px';
+            element.style.minHeight = '1123px';
+            element.style.maxWidth  = 'none';
+
+            // Allow browser to repaint at new size
+            await new Promise(function(r){ setTimeout(r, 250); });
+
+            window.showToast && window.showToast('PDF बन रही है...');
+            var blob = null;
+            try {
+                blob = await generatePDFBlob(element, invId + '.pdf');
+            } catch(e) {
+                console.error('PDF error:', e);
+            } finally {
+                // ── Always restore original zoom ──
+                element.style.zoom      = savedZoom;
+                element.style.transform = savedTransform;
+                element.style.width     = savedWidth;
+                element.style.minHeight = savedMinH;
+                element.style.maxWidth  = savedMaxW;
+                if(typeof scaleInv === 'function') setTimeout(scaleInv, 50);
+            }
+            if(!blob || blob.size < 1000) { window.showToast && window.showToast('PDF error!', 'error'); return; }
+            await downloadPDFBlob(blob, invId + '.pdf');
+            window.showToast && window.showToast('PDF downloaded! ✅');
+        };
+        window.downloadPDF._v3fix = true;
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // FIX 2 — Bulk PDF: opacity:0.001, scroll-to-top, restore
+    // ════════════════════════════════════════════════════════════
+    function applyBulkPDFFix() {
+        if(window.bulkExportPDF && window.bulkExportPDF._v3fix) return;
+        if(typeof window.bulkExportPDF === 'undefined') return;
+
+        window.bulkExportPDF = async function() {
+            // ── Gather filters ──
+            var query = ((document.getElementById('filter-search')||{}).value||'').toLowerCase();
+            var start = (document.getElementById('filter-start')||{}).value||'';
+            var end   = (document.getElementById('filter-end')||{}).value||'';
+            var pay   = (document.getElementById('filter-payment')||{}).value||'';
+
+            var filtered = (window.AppState && window.AppState.invoices || []).filter(function(i) {
+                if(i.status !== 'final' || i.isDeleted) return false;
+                return (!query || (i.id||'').toLowerCase().includes(query) || (i.client&&(i.client.name||'').toLowerCase().includes(query)))
+                    && (!start || i.date >= start)
+                    && (!end   || i.date <= end)
+                    && (!pay   || (i.paymentStatus||'unpaid') === pay);
+            });
+            if(!filtered.length) { window.showToast && window.showToast('No invoices found', 'warning'); return; }
+
+            var overlay = document.getElementById('pdf-loading-overlay');
+            if(overlay) { overlay.classList.remove('hidden'); overlay.classList.add('flex'); }
+            window.showToast && window.showToast('Generating ' + filtered.length + ' invoice PDFs...');
+
+            // ── Build stacked container ──
+            // CRITICAL: NOT visibility:hidden / display:none / left:-9999px
+            // Android WebView only renders what it would actually paint.
+            // opacity:0.001 is invisible to user but fully rendered by browser.
+            var container = document.createElement('div');
+            container.style.cssText = [
+                'position:fixed',
+                'top:0',
+                'left:0',
+                'width:794px',
+                'background:white',
+                'z-index:9998',          // high z — must be in viewport stack
+                'opacity:0.001',         // invisible but RENDERED (not hidden)
+                'pointer-events:none',
+                'overflow:visible',
+                'padding:0',
+                'margin:0',
+                'box-sizing:border-box'
+            ].join(';');
+
+            filtered.forEach(function(inv) {
+                var page = document.createElement('div');
+                page.style.cssText = [
+                    'width:794px',
+                    'min-height:1123px',
+                    'background:white',
+                    'box-sizing:border-box',
+                    'overflow:hidden',
+                    'position:relative',
+                    'page-break-after:always',
+                    'break-after:page',
+                    'zoom:1',
+                    'transform:none'
+                ].join(';');
+                page.innerHTML = window.generateInvoiceHTML ? window.generateInvoiceHTML(inv) : '';
+                container.appendChild(page);
+            });
+
+            // Save scroll position, scroll to top (required for correct capture)
+            var savedScroll = window.pageYOffset || document.documentElement.scrollTop || 0;
+            window.scrollTo(0, 0);
+            document.body.appendChild(container);
+
+            // Generous wait — let all images/fonts paint
+            await new Promise(function(r){ setTimeout(r, 1500); });
+
+            try {
+                await html2pdf().set({
+                    margin: [0, 0, 0, 0],
+                    filename: 'Bulk_Invoices_' + Date.now() + '.pdf',
+                    image: { type: 'jpeg', quality: 0.95 },
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        logging: false,
+                        backgroundColor: '#ffffff',
+                        width: 794,
+                        windowWidth: 794,
+                        scrollX: 0,
+                        scrollY: 0
+                    },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['css', 'legacy'] }
+                }).from(container).save();
+                window.showToast && window.showToast('✅ Bulk PDF downloaded!');
+            } catch(e) {
+                window.showToast && window.showToast('Bulk PDF error: ' + e.message, 'error');
+                console.error('Bulk PDF:', e);
+            } finally {
+                if(container.parentNode) container.parentNode.removeChild(container);
+                window.scrollTo(0, savedScroll);
+                if(overlay) { overlay.classList.add('hidden'); overlay.classList.remove('flex'); }
+            }
+        };
+        window.bulkExportPDF._v3fix = true;
+        window.bulkExportPDF._centerPatch = true;
+        window.bulkExportPDF._bulkFix = true;
+    }
+
+    // ════════════════════════════════════════════════════════════
+    // FIX 3 — WhatsApp share: same zoom-reset approach
+    // ════════════════════════════════════════════════════════════
+    function applyShareWAFix() {
+        if(window._shareWAv3) return;
+        window.shareInvoiceWA = async function() {
+            var id = window._curInvId || window._currentViewInvoiceId;
+            if(!id) { window.showToast && window.showToast('Invoice खोलें पहले', 'error'); return; }
+            var inv = window.AppState && window.AppState.invoices.find(function(i){ return i.id === id; });
+            if(!inv) return;
+
+            var biz = (window.AppState.settings && window.AppState.settings.businessName) || 'Dev Ayurveda';
+            var fmt = window.formatCurrency || function(a){ return '₹' + Number(a).toFixed(2); };
+            var msg = '🌿 *' + biz + '*\n\nHello ' + (inv.client&&inv.client.name||'') + ','
+                + '\n\n📋 Invoice: *' + inv.id + '*\n📅 Date: ' + inv.date
+                + '\n💰 Amount: *' + fmt(inv.grandTotal, inv.currency) + '*'
+                + '\n' + (inv.paymentStatus==='paid'?'✅ Paid':'⏳ Payment Pending')
+                + '\n\nThank you! 🙏';
+            var mobile = inv.client&&inv.client.mobile ? inv.client.mobile.replace(/\D/g,'') : '';
+            var num = mobile.length===10 ? '91'+mobile : mobile;
+
+            if(typeof html2pdf !== 'undefined' && navigator.share && navigator.canShare) {
+                var element = document.getElementById('invoice-render-area');
+                if(element) {
+                    try {
+                        window.showToast && window.showToast('PDF बन रही है...');
+                        // Reset zoom on live element (same as FIX 1)
+                        var sz = element.style.zoom, st = element.style.transform, sw = element.style.width, smh = element.style.minHeight;
+                        element.style.zoom = '1'; element.style.transform = 'none';
+                        element.style.width = '794px'; element.style.minHeight = '1123px';
+                        await new Promise(function(r){ setTimeout(r, 250); });
+                        var pdfBlob = null;
+                        try { pdfBlob = await generatePDFBlob(element, id+'.pdf'); } finally {
+                            element.style.zoom = sz; element.style.transform = st;
+                            element.style.width = sw; element.style.minHeight = smh;
+                            if(typeof scaleInv==='function') setTimeout(scaleInv, 50);
+                        }
+                        if(pdfBlob) {
+                            var pdfFile = new File([pdfBlob], id+'.pdf', {type:'application/pdf'});
+                            if(navigator.canShare({files:[pdfFile]})) {
+                                await navigator.share({files:[pdfFile], text:msg});
+                                window.showToast && window.showToast('Shared! ✅'); return;
+                            }
+                        }
+                    } catch(e) { if(e.name==='AbortError') return; }
+                }
+            }
+            window.location.href = 'https://wa.me/'+(num||'')+'?text='+encodeURIComponent(msg);
+        };
+        window._shareWAv3 = true;
+    }
+
+    // ── Apply now + retry for late-loaded scripts ──
+    function applyAll() {
+        applyDownloadPDFFix();
+        applyBulkPDFFix();
+        applyShareWAFix();
+    }
+    applyAll();
+    [1500, 3000, 6000].forEach(function(t){ setTimeout(applyAll, t); });
+
 })();
 </script>
 </body>
