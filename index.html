@@ -7,7 +7,11 @@
 <meta name="theme-color" content="#059669">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<!-- Load separately so globals are guaranteed: window.html2canvas & window.jspdf.jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:'Plus Jakarta Sans',sans-serif;background:#eef2ee;color:#0f172a;-webkit-font-smoothing:antialiased;min-height:100vh}
@@ -57,14 +61,12 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#eef2ee;color:#0f172a
 .vh-t{font-size:18px;font-weight:800;margin-bottom:2px}
 .vh-s{font-size:10px;color:rgba(255,255,255,.45)}
 
-/* Summary */
 .sum-wrap{max-width:840px;margin:14px auto 0;padding:0 14px;display:none}
 .sum-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
 .sc{background:#fff;border-radius:11px;border:1px solid #e2e8f0;padding:11px 13px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .sv{font-size:16px;font-weight:900;color:#059669}
 .sl{font-size:9px;color:#64748b;margin-top:2px}
 
-/* Cards */
 .cw{max-width:840px;margin:0 auto;padding:12px 14px 120px}
 .inv-card{background:#fff;border-radius:13px;border:1px solid #e2e8f0;margin-bottom:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .ich{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:9px;cursor:pointer;transition:background .15s}
@@ -81,23 +83,24 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#eef2ee;color:#0f172a
 .inv-body{display:none;padding:0 8px 8px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .inv-body.on{display:block}
 
-/* Footer */
 #af{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-top:1px solid #e2e8f0;padding:9px 14px;display:none;align-items:center;justify-content:center;gap:7px;z-index:100;flex-wrap:wrap}
 
 /* PDF Overlay */
-#pov{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.88);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;backdrop-filter:blur(6px)}
+#pov{position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,.9);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;backdrop-filter:blur(6px)}
 #pov.on{display:flex}
 .p-ring{width:48px;height:48px;border-radius:50%;border:3px solid rgba(255,255,255,.1);border-top-color:#10b981;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.p-msg{color:#fff;font-size:13px;font-weight:600;text-align:center;max-width:240px;line-height:1.5;white-space:pre-line}
-.p-prog{width:200px;height:4px;background:rgba(255,255,255,.15);border-radius:4px;overflow:hidden}
-.p-bar{height:100%;background:linear-gradient(90deg,#059669,#34d399);border-radius:4px;width:0;transition:width .4s}
+.p-msg{color:#fff;font-size:13px;font-weight:600;text-align:center;max-width:260px;line-height:1.6;white-space:pre-line}
+.p-prog{width:220px;height:6px;background:rgba(255,255,255,.12);border-radius:6px;overflow:hidden}
+.p-bar{height:100%;background:linear-gradient(90deg,#059669,#34d399);border-radius:6px;width:0%;transition:width .3s}
+.p-steps{display:flex;flex-direction:column;gap:4px;align-items:center}
+.p-step{font-size:11px;color:rgba(255,255,255,.4);font-weight:500}
+.p-step.done{color:#6ee7b7}
+.p-step.active{color:#fff;font-weight:700}
 
-/* Toast */
 #toast{position:fixed;top:14px;right:14px;z-index:99999;background:#1e293b;color:#fff;padding:10px 15px;border-radius:11px;font-size:12px;font-weight:700;transform:translateY(-80px);transition:transform .28s;pointer-events:none;max-width:240px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3)}
 #toast.on{transform:translateY(0)}
 
-/* Loader */
 #ldr{position:fixed;inset:0;z-index:9998;background:linear-gradient(135deg,#064e3b,#0d1117);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#fff}
 .l-ring{width:42px;height:42px;border-radius:50%;border:3px solid rgba(255,255,255,.1);border-top-color:#10b981;animation:spin .8s linear infinite}
 
@@ -117,7 +120,14 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#eef2ee;color:#0f172a
 
 <div id="ldr"><div class="l-ring"></div><div style="font-size:12px;color:rgba(255,255,255,.55);font-weight:600">Loading invoices...</div></div>
 <div id="toast"></div>
-<div id="pov"><div class="p-ring"></div><div class="p-msg" id="pmsg">PDF ban rhi hai...</div><div class="p-prog"><div class="p-bar" id="pbar"></div></div></div>
+
+<!-- PDF Overlay with step tracker -->
+<div id="pov">
+  <div class="p-ring"></div>
+  <div class="p-msg" id="pmsg">PDF ban rhi hai...</div>
+  <div class="p-prog"><div class="p-bar" id="pbar"></div></div>
+  <div class="p-steps" id="psteps"></div>
+</div>
 
 <div id="topbar">
   <div class="tb-brand">
@@ -139,11 +149,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#eef2ee;color:#0f172a
   <div class="l-badge">🌿 Dev Ayurveda ERP</div>
   <div class="l-icon">🧾</div>
   <h1 class="l-title">Invoice Viewer<br>& PDF Portal</h1>
-  <p class="l-sub">Professional invoices view, download, print aur share karein — kisi bhi device par, bina login ke.</p>
+  <p class="l-sub">Professional invoices view, download aur print karein — kisi bhi device par, bina login ke.</p>
   <div class="steps">
     <div class="step"><div class="sn">1</div><div class="st">ERP App Kholein</div><div class="sd">Records tab mein jaayein</div></div>
-    <div class="step"><div class="sn">2</div><div class="st">Link Generate Karein</div><div class="sd">"🔗 Share Link" button dabaaein</div></div>
-    <div class="step"><div class="sn">3</div><div class="st">Yahaan Aayein</div><div class="sd">Invoices automatically load honge</div></div>
+    <div class="step"><div class="sn">2</div><div class="st">Link Generate Karein</div><div class="sd">"🔗 Share Link" dabaaein</div></div>
+    <div class="step"><div class="sn">3</div><div class="st">Yahaan Aayein</div><div class="sd">Invoices automatically load</div></div>
   </div>
   <p style="color:rgba(255,255,255,.2);font-size:10px">Data URL mein securely encoded hota hai</p>
 </div>
@@ -156,21 +166,29 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#eef2ee;color:#0f172a
 <div id="af"></div>
 
 <script>
-var S={invoices:[],biz:{},tpl:'modern'};
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+var S = { invoices:[], biz:{}, tpl:'modern' };
 
-// Utils
+// ══════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════
 function b64d(s){try{s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return decodeURIComponent(escape(atob(s)));}catch(e){return null;}}
 function fmt(n){return '₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});}
-function toast(m,d){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(window._tt);window._tt=setTimeout(function(){t.classList.remove('on');},d||2500);}
-function showPov(m,p){var o=document.getElementById('pov');o.classList.add('on');document.getElementById('pmsg').textContent=m||'PDF ban rhi hai...';document.getElementById('pbar').style.width=(p||0)+'%';}
-function hidePov(){document.getElementById('pov').classList.remove('on');}
-function setProg(p,m){document.getElementById('pbar').style.width=p+'%';if(m)document.getElementById('pmsg').textContent=m;}
+function toast(m,d){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(window._tt);window._tt=setTimeout(function(){t.classList.remove('on');},d||2800);}
+function showPov(m,p){document.getElementById('pov').classList.add('on');document.getElementById('pmsg').textContent=m||'PDF ban rhi hai...';document.getElementById('pbar').style.width=(p||0)+'%';}
+function hidePov(){document.getElementById('pov').classList.remove('on');document.getElementById('psteps').innerHTML='';}
+function setProg(p,m){document.getElementById('pbar').style.width=Math.min(100,p)+'%';if(m)document.getElementById('pmsg').textContent=m;}
 function hideLoader(){var l=document.getElementById('ldr');l.style.opacity='0';l.style.transition='opacity .3s';setTimeout(function(){l.style.display='none';},320);}
+function wait(ms){return new Promise(function(r){setTimeout(r,ms);});}
 
-// Parse URL
+// ══════════════════════════════════════════════════════════════
+// PARSE URL
+// ══════════════════════════════════════════════════════════════
 (function(){
   var p=new URLSearchParams(window.location.search);
-  var iv=p.get('inv'),bk=p.get('bulk');
+  var iv=p.get('inv'), bk=p.get('bulk');
   if(!iv&&!bk){hideLoader();document.getElementById('landing').style.display='flex';return;}
   try{
     var raw=JSON.parse(b64d(bk||iv));
@@ -188,11 +206,16 @@ function norm(p){
 }
 function ebiz(p){return{bn:p.bn||'',ba:p.ba||'',bp:p.bp||'',bg:p.bg||'',bk:p.bk||'',bc:p.bc||'',bi:p.bi||'',bu:p.bu||''};}
 
+// ══════════════════════════════════════════════════════════════
+// RENDER VIEWER
+// ══════════════════════════════════════════════════════════════
 function renderViewer(){
   hideLoader();
   document.getElementById('landing').style.display='none';
-  ['topbar','tpl-bar','viewer','af'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='flex';});
+  document.getElementById('topbar').style.display='flex';
+  document.getElementById('tpl-bar').style.display='flex';
   document.getElementById('viewer').style.display='block';
+  document.getElementById('af').style.display='flex';
   var biz=S.biz,invs=S.invoices,bn=biz.bn||'Invoice Portal';
   document.title=bn+' – Invoices';
   document.getElementById('tb-n').textContent=bn;
@@ -203,11 +226,10 @@ function renderViewer(){
     var ta=invs.reduce(function(s,i){return s+i.grandTotal;},0);
     var tt=invs.reduce(function(s,i){return s+i.totalTax;},0);
     var pd=invs.filter(function(i){return i.paymentStatus==='paid';}).length;
-    var sw=document.getElementById('sw');sw.style.display='block';
+    document.getElementById('sw').style.display='block';
     document.getElementById('sg').innerHTML=[{v:invs.length,l:'Total',i:'📋'},{v:fmt(ta),l:'Grand Total',i:'💰'},{v:fmt(tt),l:'Total GST',i:'🏛️'},{v:pd+'/'+invs.length,l:'Paid',i:'✅'},{v:fmt(ta-tt),l:'Taxable',i:'📊'},{v:invs.length-pd,l:'Pending',i:'⏳'}].map(function(c){return'<div class="sc"><div class="sv">'+c.v+'</div><div class="sl">'+c.i+' '+c.l+'</div></div>';}).join('');
   }
-  renderCards();
-  buildFooter();
+  renderCards();buildFooter();
   if(invs.length===1)setTimeout(function(){toggle(0);},120);
 }
 
@@ -232,8 +254,7 @@ function renderCards(){
 
 window.toggle=function(i){
   var b=document.getElementById('ib-'+i),h=document.getElementById('ich-'+i),p=document.getElementById('ip-'+i);
-  if(!b||!h)return;
-  var open=b.classList.contains('on');
+  if(!b||!h)return;var open=b.classList.contains('on');
   b.classList.toggle('on',!open);h.classList.toggle('on',!open);
   if(!open&&p&&!p.dataset.r){p.innerHTML=invHTML(S.invoices[i],S.biz,S.tpl);p.dataset.r='1';}
 };
@@ -248,366 +269,253 @@ window.setTpl=function(t){
   toast('Template: '+t.charAt(0).toUpperCase()+t.slice(1)+' ✅');
 };
 
-// ════════════════════════════════════════════════════
-// SHARED TABLE BUILDER
-// ════════════════════════════════════════════════════
-function tbl(inv,o){
-  o=o||{};var hb=o.hb||'#0f172a',hc=o.hc||'#fff',alt=o.alt||'#f8fafc',tb=o.tb||'#ecfdf5',tc=o.tc||'#064e3b',ac=o.ac||'#059669';
-  var rows=inv.items.map(function(x,i){
-    return'<tr style="border-bottom:1px solid #f1f5f9;background:'+(i%2?alt:'#fff')+'">'
-      +'<td style="padding:9px 10px;color:#94a3b8;font-size:11px;text-align:center">'+(i+1)+'</td>'
-      +'<td style="padding:9px 10px"><div style="font-weight:700;font-size:12px;color:#1e293b">'+(x.name||'—')+'</div>'+(x.hsn?'<div style="font-size:9px;color:#94a3b8">HSN:'+x.hsn+'</div>':'')+'</td>'
-      +'<td style="padding:9px 10px;text-align:center;font-size:12px">'+x.qty+'</td>'
-      +'<td style="padding:9px 10px;text-align:right;font-size:12px">'+fmt(x.rate)+'</td>'
-      +'<td style="padding:9px 10px;text-align:right;font-size:12px">'+(x.gst?x.gst+'%':'—')+'</td>'
-      +'<td style="padding:9px 10px;text-align:right;font-weight:800;font-size:12px;color:'+ac+'">'+fmt(x.qty*x.rate)+'</td>'
-      +'</tr>';
-  }).join('');
-  var foot='';
-  if(inv.totalTax>0||inv.discount>0){
-    foot+='<tr><td colspan="4"></td><td style="padding:6px 10px;font-size:11px;color:#64748b;text-align:right">Subtotal</td><td style="padding:6px 10px;font-size:11px;color:#64748b;text-align:right">'+fmt(inv.grandTotal-inv.totalTax-inv.discount)+'</td></tr>';
-    if(inv.totalTax>0)foot+='<tr><td colspan="4"></td><td style="padding:5px 10px;font-size:11px;color:#64748b;text-align:right">GST</td><td style="padding:5px 10px;font-size:11px;color:#64748b;text-align:right">'+fmt(inv.totalTax)+'</td></tr>';
-    if(inv.discount>0)foot+='<tr><td colspan="4"></td><td style="padding:5px 10px;font-size:11px;color:#dc2626;text-align:right">Discount</td><td style="padding:5px 10px;font-size:11px;color:#dc2626;text-align:right">−'+fmt(inv.discount)+'</td></tr>';
-  }
-  foot+='<tr style="background:'+tb+'"><td colspan="4"></td><td style="padding:12px 10px;font-size:14px;font-weight:900;color:'+tc+';text-align:right">Grand Total</td><td style="padding:12px 10px;font-size:16px;font-weight:900;color:'+ac+';text-align:right">'+fmt(inv.grandTotal)+'</td></tr>';
-  return'<table style="width:100%;border-collapse:collapse;font-size:12px">'
-    +'<thead><tr style="background:'+hb+';color:'+hc+'">'
-    +'<th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;text-align:center;width:32px">#</th>'
-    +'<th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;text-align:left">Item / Description</th>'
-    +'<th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;text-align:center;width:50px">Qty</th>'
-    +'<th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;text-align:right;width:80px">Rate</th>'
-    +'<th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;text-align:right;width:50px">GST</th>'
-    +'<th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;text-align:right;width:90px">Amount</th>'
-    +'</tr></thead><tbody>'+rows+'</tbody><tfoot>'+foot+'</tfoot></table>';
-}
-
-// ════════════════════════════════════════════════════
-// 5 TEMPLATES
-// ════════════════════════════════════════════════════
-var TPL={
-
-modern:function(inv,b){
-  var pd=inv.paymentStatus==='paid';
-  return'<div style="width:794px;min-height:1000px;background:#fff;padding:40px 44px;box-sizing:border-box;font-family:\'Plus Jakarta Sans\',Arial,sans-serif">'
-    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:26px;gap:18px">'
-    +'<div style="display:flex;gap:13px;align-items:flex-start;flex:1">'
-    +'<div style="width:54px;height:54px;border-radius:13px;background:linear-gradient(135deg,#064e3b,#059669);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;font-weight:900;flex-shrink:0">'+(b.bn?b.bn.charAt(0):'🌿')+'</div>'
-    +'<div><div style="font-size:20px;font-weight:900;color:#064e3b">'+(b.bn||'Business')+'</div>'
-    +'<div style="font-size:11px;color:#64748b;margin-top:3px;line-height:1.5">'+(b.ba||'')+( b.bp?' · '+b.bp:'')+'</div>'
-    +(b.bg?'<div style="font-size:10px;color:#94a3b8;font-family:monospace;margin-top:2px">GSTIN:'+b.bg+'</div>':'')+'</div></div>'
-    +'<div style="text-align:right;flex-shrink:0">'
-    +'<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#059669;margin-bottom:4px">'+(inv.docType||'Tax Invoice')+'</div>'
-    +'<div style="font-size:25px;font-weight:900;color:#0f172a">#'+inv.id+'</div>'
-    +'<div style="font-size:11px;color:#64748b;margin-top:3px">📅 '+inv.date+'</div>'
-    +'<div style="display:inline-block;padding:3px 11px;border-radius:20px;font-size:9px;font-weight:800;margin-top:7px;'+(pd?'background:#dcfce7;color:#166534':'background:#fef3c7;color:#92400e')+'">'+(pd?'✅ PAID':'⏳ PENDING')+'</div>'
-    +'</div></div>'
-    +'<div style="height:3px;background:linear-gradient(90deg,#059669,rgba(16,185,129,.1));margin-bottom:22px;border-radius:2px"></div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px">'
-    +'<div style="background:#f8fafc;border-radius:10px;padding:13px 15px;border:1px solid #f1f5f9"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;margin-bottom:5px">Bill To</div>'
-    +'<div style="font-size:14px;font-weight:800;color:#1e293b">'+(inv.client.name||'Customer')+'</div>'
-    +(inv.client.mobile?'<div style="font-size:11px;color:#64748b;margin-top:2px">📱 '+inv.client.mobile+'</div>':'')
-    +(inv.client.address?'<div style="font-size:11px;color:#64748b;margin-top:1px">📍 '+inv.client.address+'</div>':'')
-    +(inv.client.gstin?'<div style="font-size:10px;color:#94a3b8;font-family:monospace;margin-top:1px">'+inv.client.gstin+'</div>':'')+'</div>'
-    +'<div style="background:#f8fafc;border-radius:10px;padding:13px 15px;border:1px solid #f1f5f9"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;margin-bottom:5px">Payment</div>'
-    +'<div style="font-size:12px;color:#475569">Mode: <strong>'+(inv.paymentMode||'Cash').toUpperCase()+'</strong></div>'
-    +(b.bu?'<div style="font-size:11px;color:#475569;margin-top:2px">UPI: '+b.bu+'</div>':'')
-    +'</div></div>'
-    +'<div style="border-radius:11px;overflow:hidden;margin-bottom:18px">'+tbl(inv,{hb:'#0f172a',hc:'#fff',alt:'#f8fafc',tb:'#ecfdf5',tc:'#064e3b',ac:'#059669'})+'</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'
-    +(b.bk||b.bc?'<div style="background:#f8fafc;border-radius:10px;padding:13px;border:1px solid #f1f5f9;font-size:11px;color:#64748b;line-height:1.7"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:5px">Bank Details</div>'+(b.bk?b.bk+'<br>':'')+(b.bc?'A/C: <strong>'+b.bc+'</strong><br>':'')+(b.bi?'IFSC: '+b.bi+'<br>':'')+'</div>':'<div style="background:#f8fafc;border-radius:10px;padding:13px;border:1px solid #f1f5f9;font-size:11px;color:#94a3b8;font-style:italic">Contact for payment details</div>')
-    +'<div style="background:#f8fafc;border-radius:10px;padding:13px;border:1px solid #f1f5f9;font-size:11px;color:#64748b;line-height:1.7"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:5px">Notes</div>'+(inv.notes||'')+'<div style="margin-top:5px;font-size:10px;color:#94a3b8">Thank you! 🌿</div></div>'
-    +'</div>'
-    +'<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:22px;padding-top:14px;border-top:1px solid #f1f5f9">'
-    +'<div style="font-size:10px;color:#94a3b8;font-style:italic">Dev Ayurveda ERP 🌿</div>'
-    +'<div style="text-align:center"><div style="width:110px;border-bottom:1.5px solid #cbd5e1;margin-bottom:5px"></div><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8">Authorized Signatory</div></div>'
-    +'</div></div>';
-},
-
-classic:function(inv,b){
-  var pd=inv.paymentStatus==='paid';
-  return'<div style="width:794px;min-height:1000px;background:#fff;box-sizing:border-box;font-family:Georgia,serif">'
-    +'<div style="background:#1e293b;padding:26px 38px;display:flex;align-items:center;justify-content:space-between">'
-    +'<div><div style="font-size:21px;font-weight:700;color:#fff">'+(b.bn||'Business')+'</div>'
-    +(b.bg?'<div style="font-size:10px;color:rgba(255,255,255,.4);font-family:monospace;margin-top:3px">GSTIN:'+b.bg+'</div>':'')+'</div>'
-    +'<div style="text-align:right"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:3px">'+(inv.docType||'Tax Invoice')+'</div>'
-    +'<div style="font-size:26px;font-weight:700;color:#f1f5f9">#'+inv.id+'</div></div></div>'
-    +'<div style="height:3px;background:linear-gradient(90deg,#d97706,#fbbf24)"></div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #e2e8f0">'
-    +'<div style="padding:16px 38px;border-right:1px solid #e2e8f0"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:5px">From</div>'
-    +'<div style="font-size:11px;color:#334155;line-height:1.6">'+(b.ba||'')+( b.bp?'<br>'+b.bp:'')+'</div></div>'
-    +'<div style="padding:16px 38px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:5px">Bill To</div>'
-    +'<div style="font-size:13px;font-weight:700;color:#1e293b">'+(inv.client.name||'Customer')+'</div>'
-    +(inv.client.mobile?'<div style="font-size:11px;color:#64748b;margin-top:2px">'+inv.client.mobile+'</div>':'')
-    +(inv.client.address?'<div style="font-size:11px;color:#64748b">'+inv.client.address+'</div>':'')+'</div></div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;background:#f8fafc;border-bottom:1px solid #e2e8f0">'
-    +[{l:'Date',v:inv.date},{l:'Mode',v:(inv.paymentMode||'Cash').toUpperCase()},{l:'Status',v:pd?'✅ PAID':'⏳ PENDING'}].map(function(m){return'<div style="padding:11px 22px;border-right:1px solid #e2e8f0"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin-bottom:3px">'+m.l+'</div><div style="font-size:12px;font-weight:700;color:#1e293b">'+m.v+'</div></div>';}).join('')
-    +'</div>'
-    +'<div style="padding:18px 22px">'+tbl(inv,{hb:'#334155',hc:'#f1f5f9',alt:'#fafbfc',tb:'#fef3c7',tc:'#92400e',ac:'#d97706'})+'</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:2px solid #e2e8f0;padding:18px 22px">'
-    +(b.bk?'<div style="font-size:11px;color:#64748b;line-height:1.7"><div style="font-weight:700;color:#334155;margin-bottom:4px">Bank Details</div>'+(b.bk?b.bk+'<br>':'')+(b.bc?'A/C:'+b.bc+'<br>':'')+(b.bi?'IFSC:'+b.bi:'')+'</div>':'<div></div>')
-    +'<div style="text-align:right"><div style="width:130px;border-bottom:1px solid #cbd5e1;margin:40px 0 4px auto"></div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8">Authorized Signatory</div></div></div>'
-    +'</div>';
-},
-
-minimal:function(inv,b){
-  var pd=inv.paymentStatus==='paid';
-  return'<div style="width:794px;min-height:1000px;background:#fff;padding:50px 56px;box-sizing:border-box;font-family:\'Plus Jakarta Sans\',system-ui,sans-serif">'
-    +'<div style="width:36px;height:3px;background:#0f172a;margin-bottom:30px"></div>'
-    +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:44px">'
-    +'<div><div style="font-size:22px;font-weight:900;color:#0f172a;letter-spacing:-.02em">'+(b.bn||'Business')+'</div>'
-    +(b.bg?'<div style="font-size:10px;color:#94a3b8;font-family:monospace;margin-top:3px">'+b.bg+'</div>':'')
-    +(b.ba?'<div style="font-size:10px;color:#94a3b8;margin-top:3px;line-height:1.4">'+b.ba+'</div>':'')+'</div>'
-    +'<div style="text-align:right"><div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">'+(inv.docType||'Tax Invoice')+'</div>'
-    +'<div style="font-size:26px;font-weight:900;color:#0f172a;letter-spacing:-.02em">#'+inv.id+'</div>'
-    +'<div style="font-size:10px;color:#94a3b8;margin-top:3px">'+inv.date+'</div></div></div>'
-    +'<div style="height:1px;background:#e2e8f0;margin-bottom:26px"></div>'
-    +'<div style="margin-bottom:32px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#94a3b8;margin-bottom:5px">Invoice For</div>'
-    +'<div style="font-size:15px;font-weight:800;color:#0f172a">'+(inv.client.name||'Customer')+'</div>'
-    +(inv.client.mobile?'<div style="font-size:11px;color:#64748b;margin-top:2px">'+inv.client.mobile+'</div>':'')
-    +(inv.client.address?'<div style="font-size:11px;color:#64748b;margin-top:1px">'+inv.client.address+'</div>':'')+'</div>'
-    +tbl(inv,{hb:'#f1f5f9',hc:'#475569',alt:'#fafafa',tb:'#f8fafc',tc:'#0f172a',ac:'#0f172a'})
-    +'<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:36px">'
-    +'<div>'+(pd?'<div style="display:inline-block;border:1.5px solid #059669;color:#059669;padding:5px 14px;border-radius:4px;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">✓ PAID</div>':'<div style="display:inline-block;border:1.5px solid #94a3b8;color:#94a3b8;padding:5px 14px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase">PENDING</div>')
-    +(b.bk?'<div style="font-size:10px;color:#94a3b8;margin-top:9px;line-height:1.6">'+b.bk+(b.bc?' · A/C:'+b.bc:'')+(b.bi?' · '+b.bi:'')+'</div>':'')+'</div>'
-    +'<div style="text-align:right"><div style="font-size:10px;color:#94a3b8;margin-bottom:36px">'+(inv.notes||'')+'</div><div style="width:110px;height:1px;background:#e2e8f0;margin-left:auto;margin-bottom:4px"></div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8">Signature</div></div></div>'
-    +'<div style="width:36px;height:1px;background:#e2e8f0;margin-top:26px"></div>'
-    +'</div>';
-},
-
-corporate:function(inv,b){
-  var pd=inv.paymentStatus==='paid';
-  return'<div style="width:794px;min-height:1000px;background:#fff;box-sizing:border-box;font-family:\'Plus Jakarta Sans\',Arial,sans-serif">'
-    +'<div style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);padding:30px 38px">'
-    +'<div style="display:flex;justify-content:space-between;align-items:center">'
-    +'<div><div style="font-size:22px;font-weight:900;color:#fff">'+(b.bn||'Business')+'</div>'
-    +(b.ba?'<div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:3px">'+b.ba+'</div>':'')
-    +(b.bg?'<div style="font-size:10px;color:rgba(255,255,255,.4);font-family:monospace;margin-top:2px">GSTIN:'+b.bg+'</div>':'')+'</div>'
-    +'<div style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:11px;padding:14px 20px;text-align:right">'
-    +'<div style="font-size:10px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.1em">'+(inv.docType||'Tax Invoice')+'</div>'
-    +'<div style="font-size:26px;font-weight:900;color:#fff;margin-top:1px">#'+inv.id+'</div>'
-    +'<div style="font-size:11px;color:rgba(255,255,255,.55)">'+inv.date+'</div></div></div></div>'
-    +'<div style="background:#eff6ff;border-bottom:1px solid #bfdbfe;padding:14px 38px;display:flex;align-items:center;justify-content:space-between">'
-    +'<div><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#3b82f6;margin-bottom:3px">Bill To</div>'
-    +'<div style="font-size:14px;font-weight:800;color:#1e3a8a">'+(inv.client.name||'Customer')+'</div>'
-    +(inv.client.mobile?'<div style="font-size:11px;color:#3b82f6;margin-top:1px">'+inv.client.mobile+'</div>':'')
-    +(inv.client.address?'<div style="font-size:11px;color:#64748b">'+inv.client.address+'</div>':'')+'</div>'
-    +'<div style="text-align:right"><div style="display:inline-block;padding:5px 14px;border-radius:20px;font-size:10px;font-weight:800;'+(pd?'background:#dcfce7;color:#166534':'background:#fef3c7;color:#92400e')+'">'+(pd?'✅ PAID':'⏳ PENDING')+'</div></div></div>'
-    +'<div style="padding:18px 22px">'+tbl(inv,{hb:'#1e3a8a',hc:'#fff',alt:'#f0f9ff',tb:'#eff6ff',tc:'#1e3a8a',ac:'#3b82f6'})+'</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px 22px;border-top:1px solid #bfdbfe">'
-    +(b.bk||b.bc?'<div style="background:#f0f9ff;border-radius:10px;padding:13px;font-size:11px;color:#475569;line-height:1.7"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#3b82f6;margin-bottom:5px">Payment Details</div>'+(b.bk?b.bk+'<br>':'')+(b.bc?'A/C:<strong>'+b.bc+'</strong><br>':'')+(b.bi?'IFSC:'+b.bi+'<br>':'')+(b.bu?'UPI:'+b.bu:'')+'</div>':'<div></div>')
-    +'<div style="background:#f0f9ff;border-radius:10px;padding:13px;font-size:11px;color:#475569;line-height:1.7"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#3b82f6;margin-bottom:5px">Notes</div>'+(inv.notes||'')+'<div style="margin-top:5px;font-size:10px;color:#94a3b8">Thank you for your business!</div></div></div>'
-    +'<div style="text-align:right;padding:10px 22px;border-top:1px solid #e2e8f0"><div style="width:120px;border-bottom:1.5px solid #bfdbfe;margin-left:auto;margin-bottom:4px"></div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#3b82f6">Authorized Signatory</div></div>'
-    +'</div>';
-},
-
-premium:function(inv,b){
-  var pd=inv.paymentStatus==='paid';
-  return'<div style="width:794px;min-height:1000px;background:#0d1117;box-sizing:border-box;font-family:\'Plus Jakarta Sans\',sans-serif">'
-    +'<div style="height:3px;background:linear-gradient(90deg,#d97706,#fbbf24)"></div>'
-    +'<div style="padding:34px 42px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid rgba(255,255,255,.06)">'
-    +'<div><div style="font-size:21px;font-weight:900;color:#f1f5f9">'+(b.bn||'Business')+'</div>'
-    +(b.ba?'<div style="font-size:11px;color:rgba(255,255,255,.38);margin-top:4px;line-height:1.5">'+b.ba+'</div>':'')
-    +(b.bg?'<div style="font-size:10px;color:rgba(255,255,255,.22);font-family:monospace;margin-top:2px">GSTIN:'+b.bg+'</div>':'')+'</div>'
-    +'<div style="text-align:right"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#d97706;margin-bottom:4px">'+(inv.docType||'Tax Invoice')+'</div>'
-    +'<div style="font-size:26px;font-weight:900;color:#f1f5f9">#'+inv.id+'</div>'
-    +'<div style="font-size:11px;color:rgba(255,255,255,.38);margin-top:3px">'+inv.date+'</div>'
-    +'<div style="display:inline-block;margin-top:7px;padding:3px 12px;border-radius:20px;font-size:9px;font-weight:800;'+(pd?'background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#6ee7b7':'background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);color:#fbbf24')+'">'+(pd?'✅ PAID':'⏳ PENDING')+'</div></div></div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:22px 42px;border-bottom:1px solid rgba(255,255,255,.06)">'
-    +'<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:14px"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#d97706;margin-bottom:7px">Bill To</div>'
-    +'<div style="font-size:14px;font-weight:800;color:#f1f5f9">'+(inv.client.name||'Customer')+'</div>'
-    +(inv.client.mobile?'<div style="font-size:11px;color:rgba(255,255,255,.42);margin-top:2px">'+inv.client.mobile+'</div>':'')
-    +(inv.client.address?'<div style="font-size:11px;color:rgba(255,255,255,.38);margin-top:1px">'+inv.client.address+'</div>':'')+'</div>'
-    +'<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:14px"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#d97706;margin-bottom:7px">Payment</div>'
-    +'<div style="font-size:12px;color:rgba(255,255,255,.55)">Mode: '+(inv.paymentMode||'Cash').toUpperCase()+'</div>'
-    +(b.bu?'<div style="font-size:11px;color:rgba(255,255,255,.42);margin-top:2px">UPI: '+b.bu+'</div>':'')
-    +(b.bc?'<div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:1px">A/C: '+b.bc+'</div>':'')+'</div></div>'
-    // Dark table
-    +'<div style="padding:0 22px 22px">'
-    +'<table style="width:100%;border-collapse:collapse;font-size:12px">'
-    +'<thead><tr style="background:rgba(251,191,36,.08);border-bottom:1px solid rgba(251,191,36,.18)">'
-    +'<th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#d97706;text-align:center;width:32px">#</th>'
-    +'<th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#d97706;text-align:left">Item</th>'
-    +'<th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#d97706;text-align:center;width:50px">Qty</th>'
-    +'<th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#d97706;text-align:right;width:80px">Rate</th>'
-    +'<th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#d97706;text-align:right;width:50px">GST</th>'
-    +'<th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#d97706;text-align:right;width:90px">Amount</th>'
-    +'</tr></thead><tbody>'
-    +inv.items.map(function(x,i){return'<tr style="border-bottom:1px solid rgba(255,255,255,.05);background:'+(i%2?'rgba(255,255,255,.02)':'transparent')+'">'
-      +'<td style="padding:9px 10px;color:rgba(255,255,255,.25);font-size:11px;text-align:center">'+(i+1)+'</td>'
-      +'<td style="padding:9px 10px"><div style="font-weight:700;font-size:12px;color:#f1f5f9">'+(x.name||'—')+'</div>'+(x.hsn?'<div style="font-size:9px;color:rgba(255,255,255,.25)">HSN:'+x.hsn+'</div>':'')+'</td>'
-      +'<td style="padding:9px 10px;text-align:center;font-size:12px;color:rgba(255,255,255,.65)">'+x.qty+'</td>'
-      +'<td style="padding:9px 10px;text-align:right;font-size:12px;color:rgba(255,255,255,.65)">'+fmt(x.rate)+'</td>'
-      +'<td style="padding:9px 10px;text-align:right;font-size:12px;color:rgba(255,255,255,.45)">'+(x.gst?x.gst+'%':'—')+'</td>'
-      +'<td style="padding:9px 10px;text-align:right;font-weight:800;font-size:12px;color:#fbbf24">'+fmt(x.qty*x.rate)+'</td>'
-      +'</tr>';}).join('')
-    +'</tbody><tfoot>'
-    +(inv.totalTax>0?'<tr><td colspan="4"></td><td style="padding:6px 10px;font-size:11px;color:rgba(255,255,255,.35);text-align:right">GST</td><td style="padding:6px 10px;font-size:11px;color:rgba(255,255,255,.35);text-align:right">'+fmt(inv.totalTax)+'</td></tr>':'')
-    +(inv.discount>0?'<tr><td colspan="4"></td><td style="padding:5px 10px;font-size:11px;color:#f87171;text-align:right">Discount</td><td style="padding:5px 10px;font-size:11px;color:#f87171;text-align:right">−'+fmt(inv.discount)+'</td></tr>':'')
-    +'<tr style="background:rgba(251,191,36,.08);border-top:1px solid rgba(251,191,36,.18)"><td colspan="4"></td><td style="padding:12px 10px;font-size:14px;font-weight:900;color:#f1f5f9;text-align:right">Grand Total</td><td style="padding:12px 10px;font-size:16px;font-weight:900;color:#fbbf24;text-align:right">'+fmt(inv.grandTotal)+'</td></tr>'
-    +'</tfoot></table></div>'
-    +(inv.notes?'<div style="margin:0 22px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:11px 14px;font-size:11px;color:rgba(255,255,255,.38)">'+inv.notes+'</div>':'')
-    +'<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 42px;border-top:1px solid rgba(255,255,255,.06)">'
-    +'<div style="font-size:10px;color:rgba(255,255,255,.18)">Dev Ayurveda ERP</div>'
-    +'<div style="text-align:center"><div style="width:110px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:4px"></div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#d97706">Authorized Signatory</div></div></div>'
-    +'<div style="height:3px;background:linear-gradient(90deg,#d97706,#fbbf24)"></div>'
-    +'</div>';
-}
-
-}; // end TPL
-
+// ══════════════════════════════════════════════════════════════
+// INVOICE HTML BUILDER — dispatch to template
+// ══════════════════════════════════════════════════════════════
 function invHTML(inv,b,t){return (TPL[t]||TPL.modern)(inv,b);}
 
-// ════════════════════════════════════════════════════
-// PDF OPTIONS — Android optimized
-// ════════════════════════════════════════════════════
-var POPT={margin:[0,0,0,0],image:{type:'jpeg',quality:0.95},html2canvas:{scale:2,useCORS:true,allowTaint:true,logging:false,backgroundColor:'#ffffff',width:794,windowWidth:794,scrollX:0,scrollY:0},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}};
-
-// ════════════════════════════════════════════════════
-// ANDROID-SAFE PDF HELPER
-// Creates off-screen container: position:fixed, top:0, left:0,
-// opacity:0.001 — invisible but FULLY RENDERED by browser
-// This is the ONLY approach that works on Android WebView
-// ════════════════════════════════════════════════════
-function makePdfContainer(htmlStr, darkBg){
-  var c=document.createElement('div');
-  c.style.cssText='position:fixed;top:0;left:0;width:794px;'+(darkBg?'':'background:white;')+'z-index:9997;opacity:0.001;pointer-events:none;overflow:visible;padding:0;margin:0;box-sizing:border-box;';
-  c.innerHTML=htmlStr;
-  return c;
+// Shared items table
+function tbl(inv,o){
+  o=o||{};var hb=o.hb||'#0f172a',hc=o.hc||'#fff',alt=o.alt||'#f8fafc',tb=o.tb||'#ecfdf5',tc=o.tc||'#064e3b',ac=o.ac||'#059669';
+  var rows=inv.items.map(function(x,i){return'<tr style="border-bottom:1px solid #f1f5f9;background:'+(i%2?alt:'#fff')+'">'
+    +'<td style="padding:9px 10px;color:#94a3b8;font-size:11px;text-align:center">'+(i+1)+'</td>'
+    +'<td style="padding:9px 10px"><div style="font-weight:700;font-size:12px;color:#1e293b">'+(x.name||'—')+'</div>'+(x.hsn?'<div style="font-size:9px;color:#94a3b8">HSN:'+x.hsn+'</div>':'')+'</td>'
+    +'<td style="padding:9px 10px;text-align:center;font-size:12px">'+x.qty+'</td>'
+    +'<td style="padding:9px 10px;text-align:right;font-size:12px">'+fmt(x.rate)+'</td>'
+    +'<td style="padding:9px 10px;text-align:right;font-size:12px">'+(x.gst?x.gst+'%':'—')+'</td>'
+    +'<td style="padding:9px 10px;text-align:right;font-weight:800;font-size:12px;color:'+ac+'">'+fmt(x.qty*x.rate)+'</td>'
+    +'</tr>';}).join('');
+  var foot='';
+  if(inv.totalTax>0||inv.discount>0){foot+='<tr><td colspan="4"></td><td style="padding:6px 10px;font-size:11px;color:#64748b;text-align:right">Subtotal</td><td style="padding:6px 10px;font-size:11px;color:#64748b;text-align:right">'+fmt(inv.grandTotal-inv.totalTax-inv.discount)+'</td></tr>';
+    if(inv.totalTax>0)foot+='<tr><td colspan="4"></td><td style="padding:5px 10px;font-size:11px;color:#64748b;text-align:right">GST</td><td style="padding:5px 10px;font-size:11px;color:#64748b;text-align:right">'+fmt(inv.totalTax)+'</td></tr>';
+    if(inv.discount>0)foot+='<tr><td colspan="4"></td><td style="padding:5px 10px;font-size:11px;color:#dc2626;text-align:right">Discount</td><td style="padding:5px 10px;font-size:11px;color:#dc2626;text-align:right">−'+fmt(inv.discount)+'</td></tr>';}
+  foot+='<tr style="background:'+tb+'"><td colspan="4"></td><td style="padding:12px 10px;font-size:14px;font-weight:900;color:'+tc+';text-align:right">Grand Total</td><td style="padding:12px 10px;font-size:16px;font-weight:900;color:'+ac+';text-align:right">'+fmt(inv.grandTotal)+'</td></tr>';
+  return'<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:'+hb+';color:'+hc+'"><th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;text-align:center;width:32px">#</th><th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;text-align:left">Item</th><th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;text-align:center;width:50px">Qty</th><th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;text-align:right;width:80px">Rate</th><th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;text-align:right;width:50px">GST</th><th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;text-align:right;width:90px">Amount</th></tr></thead><tbody>'+rows+'</tbody><tfoot>'+foot+'</tfoot></table>';
 }
 
-// ════════════════════════════════════════════════════
-// DOWNLOAD SINGLE
-// ════════════════════════════════════════════════════
-window.dlSingle=function(i){
-  // Ensure open
-  var body=document.getElementById('ib-'+i),head=document.getElementById('ich-'+i),page=document.getElementById('ip-'+i);
-  if(body&&!body.classList.contains('on')){body.classList.add('on');head.classList.add('on');}
-  if(page&&!page.dataset.r){page.innerHTML=invHTML(S.invoices[i],S.biz,S.tpl);page.dataset.r='1';}
-
-  var inv=S.invoices[i];
-  // For premium (dark), force modern for PDF readability
-  var pdfTpl=S.tpl;
-  showPov('PDF ban rhi hai...\n'+inv.id,20);
-
-  var cont=makePdfContainer(invHTML(inv,S.biz,pdfTpl), pdfTpl==='premium');
-  var sv=window.pageYOffset||document.documentElement.scrollTop||0;
-  window.scrollTo(0,0);
-  document.body.appendChild(cont);
-
-  setTimeout(function(){
-    setProg(55,'Rendering...');
-    html2pdf().set(Object.assign({},POPT,{filename:'Invoice_'+inv.id+'.pdf'}))
-      .from(cont).save()
-      .then(function(){toast('✅ PDF downloaded!');setProg(100,'Done!');setTimeout(hidePov,600);})
-      .catch(function(e){toast('Error: '+e.message);hidePov();})
-      .finally(function(){if(cont.parentNode)cont.parentNode.removeChild(cont);window.scrollTo(0,sv);});
-  },1200);
+// ════════ 5 TEMPLATES ════════
+var TPL={
+modern:function(inv,b){var pd=inv.paymentStatus==='paid';return'<div style="width:794px;min-height:1000px;background:#fff;padding:40px 44px;box-sizing:border-box;font-family:\'Plus Jakarta Sans\',Arial,sans-serif"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:26px;gap:18px"><div style="display:flex;gap:13px;align-items:flex-start;flex:1"><div style="width:54px;height:54px;border-radius:13px;background:linear-gradient(135deg,#064e3b,#059669);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;font-weight:900;flex-shrink:0">'+(b.bn?b.bn.charAt(0):'🌿')+'</div><div><div style="font-size:20px;font-weight:900;color:#064e3b">'+(b.bn||'Business')+'</div><div style="font-size:11px;color:#64748b;margin-top:3px;line-height:1.5">'+(b.ba||'')+( b.bp?' · '+b.bp:'')+'</div>'+(b.bg?'<div style="font-size:10px;color:#94a3b8;font-family:monospace;margin-top:2px">GSTIN:'+b.bg+'</div>':'')+'</div></div><div style="text-align:right;flex-shrink:0"><div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#059669;margin-bottom:4px">'+(inv.docType||'Tax Invoice')+'</div><div style="font-size:25px;font-weight:900;color:#0f172a">#'+inv.id+'</div><div style="font-size:11px;color:#64748b;margin-top:3px">📅 '+inv.date+'</div><div style="display:inline-block;padding:3px 11px;border-radius:20px;font-size:9px;font-weight:800;margin-top:7px;'+(pd?'background:#dcfce7;color:#166534':'background:#fef3c7;color:#92400e')+'">'+(pd?'✅ PAID':'⏳ PENDING')+'</div></div></div><div style="height:3px;background:linear-gradient(90deg,#059669,rgba(16,185,129,.1));margin-bottom:22px;border-radius:2px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px"><div style="background:#f8fafc;border-radius:10px;padding:13px 15px;border:1px solid #f1f5f9"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;margin-bottom:5px">Bill To</div><div style="font-size:14px;font-weight:800;color:#1e293b">'+(inv.client.name||'Customer')+'</div>'+(inv.client.mobile?'<div style="font-size:11px;color:#64748b;margin-top:2px">📱 '+inv.client.mobile+'</div>':'')+(inv.client.address?'<div style="font-size:11px;color:#64748b;margin-top:1px">'+inv.client.address+'</div>':'')+(inv.client.gstin?'<div style="font-size:10px;color:#94a3b8;font-family:monospace;margin-top:1px">'+inv.client.gstin+'</div>':'')+'</div><div style="background:#f8fafc;border-radius:10px;padding:13px 15px;border:1px solid #f1f5f9"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#94a3b8;margin-bottom:5px">Payment</div><div style="font-size:12px;color:#475569">Mode: <strong>'+(inv.paymentMode||'Cash').toUpperCase()+'</strong></div>'+(b.bu?'<div style="font-size:11px;color:#475569;margin-top:2px">UPI: '+b.bu+'</div>':'')+'</div></div><div style="border-radius:11px;overflow:hidden;margin-bottom:18px">'+tbl(inv,{hb:'#0f172a',hc:'#fff',alt:'#f8fafc',tb:'#ecfdf5',tc:'#064e3b',ac:'#059669'})+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'+(b.bk||b.bc?'<div style="background:#f8fafc;border-radius:10px;padding:13px;border:1px solid #f1f5f9;font-size:11px;color:#64748b;line-height:1.7"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:5px">Bank Details</div>'+(b.bk?b.bk+'<br>':'')+(b.bc?'A/C:<strong>'+b.bc+'</strong><br>':'')+(b.bi?'IFSC:'+b.bi+'<br>':'')+(b.bu?'UPI:'+b.bu:'')+'</div>':'<div style="background:#f8fafc;border-radius:10px;padding:13px;border:1px solid #f1f5f9;font-size:11px;color:#94a3b8;font-style:italic">Contact for payment details</div>')+'<div style="background:#f8fafc;border-radius:10px;padding:13px;border:1px solid #f1f5f9;font-size:11px;color:#64748b;line-height:1.7"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:5px">Notes</div>'+(inv.notes||'')+'<div style="margin-top:5px;font-size:10px;color:#94a3b8">Thank you! 🌿</div></div></div><div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:22px;padding-top:14px;border-top:1px solid #f1f5f9"><div style="font-size:10px;color:#94a3b8;font-style:italic">Dev Ayurveda ERP 🌿</div><div style="text-align:center"><div style="width:110px;border-bottom:1.5px solid #cbd5e1;margin-bottom:5px"></div><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8">Authorized Signatory</div></div></div></div>';},
+classic:function(inv,b){var pd=inv.paymentStatus==='paid';return'<div style="width:794px;min-height:1000px;background:#fff;box-sizing:border-box;font-family:Georgia,serif"><div style="background:#1e293b;padding:26px 38px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:21px;font-weight:700;color:#fff">'+(b.bn||'Business')+'</div>'+(b.bg?'<div style="font-size:10px;color:rgba(255,255,255,.4);font-family:monospace;margin-top:3px">GSTIN:'+b.bg+'</div>':'')+'</div><div style="text-align:right"><div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:3px">'+(inv.docType||'Tax Invoice')+'</div><div style="font-size:26px;font-weight:700;color:#f1f5f9">#'+inv.id+'</div></div></div><div style="height:3px;background:linear-gradient(90deg,#d97706,#fbbf24)"></div><div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #e2e8f0"><div style="padding:16px 38px;border-right:1px solid #e2e8f0"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:5px">From</div><div style="font-size:11px;color:#334155;line-height:1.6">'+(b.ba||'')+( b.bp?'<br>'+b.bp:'')+'</div></div><div style="padding:16px 38px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:5px">Bill To</div><div style="font-size:13px;font-weight:700;color:#1e293b">'+(inv.client.name||'Customer')+'</div>'+(inv.client.mobile?'<div style="font-size:11px;color:#64748b;margin-top:2px">'+inv.client.mobile+'</div>':'')+(inv.client.address?'<div style="font-size:11px;color:#64748b">'+inv.client.address+'</div>':'')+'</div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;background:#f8fafc;border-bottom:1px solid #e2e8f0">'+[{l:'Date',v:inv.date},{l:'Mode',v:(inv.paymentMode||'Cash').toUpperCase()},{l:'Status',v:pd?'✅ PAID':'⏳ PENDING'}].map(function(m){return'<div style="padding:11px 22px;border-right:1px solid #e2e8f0"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin-bottom:3px">'+m.l+'</div><div style="font-size:12px;font-weight:700;color:#1e293b">'+m.v+'</div></div>';}).join('')+'</div><div style="padding:18px 22px">'+tbl(inv,{hb:'#334155',hc:'#f1f5f9',alt:'#fafbfc',tb:'#fef3c7',tc:'#92400e',ac:'#d97706'})+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:2px solid #e2e8f0;padding:18px 22px">'+(b.bk?'<div style="font-size:11px;color:#64748b;line-height:1.7"><div style="font-weight:700;color:#334155;margin-bottom:4px">Bank Details</div>'+(b.bk?b.bk+'<br>':'')+(b.bc?'A/C:'+b.bc+'<br>':'')+(b.bi?'IFSC:'+b.bi:'')+'</div>':'<div></div>')+'<div style="text-align:right"><div style="width:130px;border-bottom:1px solid #cbd5e1;margin:40px 0 4px auto"></div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8">Authorized Signatory</div></div></div></div>';},
+minimal:function(inv,b){var pd=inv.paymentStatus==='paid';return'<div style="width:794px;min-height:1000px;background:#fff;padding:50px 56px;box-sizing:border-box;font-family:\'Plus Jakarta Sans\',system-ui,sans-serif"><div style="width:36px;height:3px;background:#0f172a;margin-bottom:30px"></div><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:44px"><div><div style="font-size:22px;font-weight:900;color:#0f172a;letter-spacing:-.02em">'+(b.bn||'Business')+'</div>'+(b.bg?'<div style="font-size:10px;color:#94a3b8;font-family:monospace;margin-top:3px">'+b.bg+'</div>':'')+(b.ba?'<div style="font-size:10px;color:#94a3b8;margin-top:3px;line-height:1.4">'+b.ba+'</div>':'')+'</div><div style="text-align:right"><div style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px">'+(inv.docType||'Tax Invoice')+'</div><div style="font-size:26px;font-weight:900;color:#0f172a;letter-spacing:-.02em">#'+inv.id+'</div><div style="font-size:10px;color:#94a3b8;margin-top:3px">'+inv.date+'</div></div></div><div style="height:1px;background:#e2e8f0;margin-bottom:26px"></div><div style="margin-bottom:32px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:#94a3b8;margin-bottom:5px">Invoice For</div><div style="font-size:15px;font-weight:800;color:#0f172a">'+(inv.client.name||'Customer')+'</div>'+(inv.client.mobile?'<div style="font-size:11px;color:#64748b;margin-top:2px">'+inv.client.mobile+'</div>':'')+(inv.client.address?'<div style="font-size:11px;color:#64748b;margin-top:1px">'+inv.client.address+'</div>':'')+'</div>'+tbl(inv,{hb:'#f1f5f9',hc:'#475569',alt:'#fafafa',tb:'#f8fafc',tc:'#0f172a',ac:'#0f172a'})+'<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:36px"><div>'+(pd?'<div style="display:inline-block;border:1.5px solid #059669;color:#059669;padding:5px 14px;border-radius:4px;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">✓ PAID</div>':'<div style="display:inline-block;border:1.5px solid #94a3b8;color:#94a3b8;padding:5px 14px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase">PENDING</div>')+(b.bk?'<div style="font-size:10px;color:#94a3b8;margin-top:9px;line-height:1.6">'+b.bk+(b.bc?' · A/C:'+b.bc:'')+(b.bi?' · '+b.bi:'')+'</div>':'')+'</div><div style="text-align:right"><div style="font-size:10px;color:#94a3b8;margin-bottom:36px">'+(inv.notes||'')+'</div><div style="width:110px;height:1px;background:#e2e8f0;margin-left:auto;margin-bottom:4px"></div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8">Signature</div></div></div><div style="width:36px;height:1px;background:#e2e8f0;margin-top:26px"></div></div>';},
+corporate:function(inv,b){var pd=inv.paymentStatus==='paid';return'<div style="width:794px;min-height:1000px;background:#fff;box-sizing:border-box;font-family:\'Plus Jakarta Sans\',Arial,sans-serif"><div style="background:linear-gradient(135deg,#1e3a8a,#3b82f6);padding:30px 38px"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:22px;font-weight:900;color:#fff">'+(b.bn||'Business')+'</div>'+(b.ba?'<div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:3px">'+b.ba+'</div>':'')+(b.bg?'<div style="font-size:10px;color:rgba(255,255,255,.4);font-family:monospace;margin-top:2px">GSTIN:'+b.bg+'</div>':'')+'</div><div style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:11px;padding:14px 20px;text-align:right"><div style="font-size:10px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.1em">'+(inv.docType||'Tax Invoice')+'</div><div style="font-size:26px;font-weight:900;color:#fff;margin-top:1px">#'+inv.id+'</div><div style="font-size:11px;color:rgba(255,255,255,.55)">'+inv.date+'</div></div></div></div><div style="background:#eff6ff;border-bottom:1px solid #bfdbfe;padding:14px 38px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#3b82f6;margin-bottom:3px">Bill To</div><div style="font-size:14px;font-weight:800;color:#1e3a8a">'+(inv.client.name||'Customer')+'</div>'+(inv.client.mobile?'<div style="font-size:11px;color:#3b82f6;margin-top:1px">'+inv.client.mobile+'</div>':'')+(inv.client.address?'<div style="font-size:11px;color:#64748b">'+inv.client.address+'</div>':'')+'</div><div style="text-align:right"><div style="display:inline-block;padding:5px 14px;border-radius:20px;font-size:10px;font-weight:800;'+(pd?'background:#dcfce7;color:#166534':'background:#fef3c7;color:#92400e')+'">'+(pd?'✅ PAID':'⏳ PENDING')+'</div></div></div><div style="padding:18px 22px">'+tbl(inv,{hb:'#1e3a8a',hc:'#fff',alt:'#f0f9ff',tb:'#eff6ff',tc:'#1e3a8a',ac:'#3b82f6'})+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px 22px;border-top:1px solid #bfdbfe">'+(b.bk||b.bc?'<div style="background:#f0f9ff;border-radius:10px;padding:13px;font-size:11px;color:#475569;line-height:1.7"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#3b82f6;margin-bottom:5px">Payment</div>'+(b.bk?b.bk+'<br>':'')+(b.bc?'A/C:<strong>'+b.bc+'</strong><br>':'')+(b.bi?'IFSC:'+b.bi+'<br>':'')+(b.bu?'UPI:'+b.bu:'')+'</div>':'<div></div>')+'<div style="background:#f0f9ff;border-radius:10px;padding:13px;font-size:11px;color:#475569;line-height:1.7"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:#3b82f6;margin-bottom:5px">Notes</div>'+(inv.notes||'')+'<div style="margin-top:5px;font-size:10px;color:#94a3b8">Thank you!</div></div></div><div style="text-align:right;padding:10px 22px;border-top:1px solid #e2e8f0"><div style="width:120px;border-bottom:1.5px solid #bfdbfe;margin-left:auto;margin-bottom:4px"></div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#3b82f6">Authorized Signatory</div></div></div>';},
+premium:function(inv,b){var pd=inv.paymentStatus==='paid';return'<div style="width:794px;min-height:1000px;background:#0d1117;box-sizing:border-box;font-family:\'Plus Jakarta Sans\',sans-serif"><div style="height:3px;background:linear-gradient(90deg,#d97706,#fbbf24)"></div><div style="padding:34px 42px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid rgba(255,255,255,.06)"><div><div style="font-size:21px;font-weight:900;color:#f1f5f9">'+(b.bn||'Business')+'</div>'+(b.ba?'<div style="font-size:11px;color:rgba(255,255,255,.38);margin-top:4px;line-height:1.5">'+b.ba+'</div>':'')+(b.bg?'<div style="font-size:10px;color:rgba(255,255,255,.22);font-family:monospace;margin-top:2px">GSTIN:'+b.bg+'</div>':'')+'</div><div style="text-align:right"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#d97706;margin-bottom:4px">'+(inv.docType||'Tax Invoice')+'</div><div style="font-size:26px;font-weight:900;color:#f1f5f9">#'+inv.id+'</div><div style="font-size:11px;color:rgba(255,255,255,.38);margin-top:3px">'+inv.date+'</div><div style="display:inline-block;margin-top:7px;padding:3px 12px;border-radius:20px;font-size:9px;font-weight:800;'+(pd?'background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#6ee7b7':'background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);color:#fbbf24')+'">'+(pd?'✅ PAID':'⏳ PENDING')+'</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:22px 42px;border-bottom:1px solid rgba(255,255,255,.06)"><div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:14px"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#d97706;margin-bottom:7px">Bill To</div><div style="font-size:14px;font-weight:800;color:#f1f5f9">'+(inv.client.name||'Customer')+'</div>'+(inv.client.mobile?'<div style="font-size:11px;color:rgba(255,255,255,.42);margin-top:2px">'+inv.client.mobile+'</div>':'')+(inv.client.address?'<div style="font-size:11px;color:rgba(255,255,255,.38);margin-top:1px">'+inv.client.address+'</div>':'')+'</div><div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:11px;padding:14px"><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#d97706;margin-bottom:7px">Payment</div><div style="font-size:12px;color:rgba(255,255,255,.55)">Mode: '+(inv.paymentMode||'Cash').toUpperCase()+'</div>'+(b.bu?'<div style="font-size:11px;color:rgba(255,255,255,.42);margin-top:2px">UPI: '+b.bu+'</div>':'')+(b.bc?'<div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:1px">A/C: '+b.bc+'</div>':'')+'</div></div><div style="padding:0 22px 22px"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:rgba(251,191,36,.08);border-bottom:1px solid rgba(251,191,36,.18)"><th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#d97706;text-align:center;width:32px">#</th><th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#d97706;text-align:left">Item</th><th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#d97706;text-align:center;width:50px">Qty</th><th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#d97706;text-align:right;width:80px">Rate</th><th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#d97706;text-align:right;width:50px">GST</th><th style="padding:9px 10px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#d97706;text-align:right;width:90px">Amount</th></tr></thead><tbody>'+inv.items.map(function(x,i){return'<tr style="border-bottom:1px solid rgba(255,255,255,.05);background:'+(i%2?'rgba(255,255,255,.02)':'transparent')+'"><td style="padding:9px 10px;color:rgba(255,255,255,.25);font-size:11px;text-align:center">'+(i+1)+'</td><td style="padding:9px 10px"><div style="font-weight:700;font-size:12px;color:#f1f5f9">'+(x.name||'—')+'</div>'+(x.hsn?'<div style="font-size:9px;color:rgba(255,255,255,.25)">HSN:'+x.hsn+'</div>':'')+'</td><td style="padding:9px 10px;text-align:center;font-size:12px;color:rgba(255,255,255,.65)">'+x.qty+'</td><td style="padding:9px 10px;text-align:right;font-size:12px;color:rgba(255,255,255,.65)">'+fmt(x.rate)+'</td><td style="padding:9px 10px;text-align:right;font-size:12px;color:rgba(255,255,255,.45)">'+(x.gst?x.gst+'%':'—')+'</td><td style="padding:9px 10px;text-align:right;font-weight:800;font-size:12px;color:#fbbf24">'+fmt(x.qty*x.rate)+'</td></tr>';}).join('')+'</tbody><tfoot>'+(inv.totalTax>0?'<tr><td colspan="4"></td><td style="padding:6px 10px;font-size:11px;color:rgba(255,255,255,.35);text-align:right">GST</td><td style="padding:6px 10px;font-size:11px;color:rgba(255,255,255,.35);text-align:right">'+fmt(inv.totalTax)+'</td></tr>':'')+(inv.discount>0?'<tr><td colspan="4"></td><td style="padding:5px 10px;font-size:11px;color:#f87171;text-align:right">Discount</td><td style="padding:5px 10px;font-size:11px;color:#f87171;text-align:right">−'+fmt(inv.discount)+'</td></tr>':'')+'<tr style="background:rgba(251,191,36,.08);border-top:1px solid rgba(251,191,36,.18)"><td colspan="4"></td><td style="padding:12px 10px;font-size:14px;font-weight:900;color:#f1f5f9;text-align:right">Grand Total</td><td style="padding:12px 10px;font-size:16px;font-weight:900;color:#fbbf24;text-align:right">'+fmt(inv.grandTotal)+'</td></tr></tfoot></table></div>'+(inv.notes?'<div style="margin:0 22px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:11px 14px;font-size:11px;color:rgba(255,255,255,.38)">'+inv.notes+'</div>':'')+'<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 42px;border-top:1px solid rgba(255,255,255,.06)"><div style="font-size:10px;color:rgba(255,255,255,.18)">Dev Ayurveda ERP</div><div style="text-align:center"><div style="width:110px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:4px"></div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#d97706">Authorized Signatory</div></div></div><div style="height:3px;background:linear-gradient(90deg,#d97706,#fbbf24)"></div></div>';}
 };
 
-// ════════════════════════════════════════════════════
-// SINGLE PRINT
-// ════════════════════════════════════════════════════
-window.prtSingle=function(i){
+// ══════════════════════════════════════════════════════════════
+// ★★★ CORE PDF ENGINE — SEQUENTIAL PER-PAGE CAPTURE ★★★
+//
+// Android WebView sirf ek page render kar sakta hai viewport mein.
+// Solution: Ek ek invoice render karo, html2canvas se capture karo,
+// phir sab pages ko ek jsPDF document mein combine karo.
+// Yeh approach guaranteed kaam karta hai Android pe bhi.
+// ══════════════════════════════════════════════════════════════
+async function capturePageToCanvas(htmlStr) {
+  // Create single-page container
+  var cont = document.createElement('div');
+  cont.style.cssText = [
+    'position:fixed',
+    'top:0',
+    'left:0',
+    'width:794px',
+    'min-height:1123px',
+    'background:white',        // MUST be white for html2canvas
+    'z-index:9997',
+    'opacity:0.001',           // invisible but RENDERED (not display:none)
+    'pointer-events:none',
+    'overflow:hidden',
+    'box-sizing:border-box'
+  ].join(';');
+  cont.innerHTML = htmlStr;
+
+  // MUST scroll to top AND be in document before capture
+  window.scrollTo(0, 0);
+  document.body.appendChild(cont);
+
+  // Wait for fonts + images to load
+  await wait(900);
+
+  try {
+    var canvas = await window.html2canvas(cont, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+      width: 794,
+      height: 1123,
+      windowWidth: 794,
+      windowHeight: 1123,
+      scrollX: 0,
+      scrollY: 0,
+      x: 0,
+      y: 0
+    });
+    return canvas;
+  } finally {
+    // Always remove — even if error
+    if (cont.parentNode) cont.parentNode.removeChild(cont);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// BULK PDF — One file, sequential page capture
+// ══════════════════════════════════════════════════════════════
+async function dlBulk() {
+  var invs = S.invoices, biz = S.biz;
+  if (!invs.length) { toast('Koi invoice nahi'); return; }
+
+  // Check libraries loaded
+  if (!window.html2canvas) { toast('html2canvas load nahi hua, refresh karein', 3000); return; }
+  if (!window.jspdf) { toast('jsPDF load nahi hua, refresh karein', 3000); return; }
+
+  var jsPDF = window.jspdf.jsPDF;
+  var doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+  var pdfW = doc.internal.pageSize.getWidth();   // 210mm
+  var pdfH = doc.internal.pageSize.getHeight();  // 297mm
+
+  // Premium = dark bg → use modern for PDF print clarity
+  var pdfTpl = (S.tpl === 'premium') ? 'modern' : S.tpl;
+
+  showPov('Bulk PDF shuruaat...\n0 / ' + invs.length + ' pages', 0);
+
+  var savedScroll = window.pageYOffset || 0;
+
+  try {
+    for (var i = 0; i < invs.length; i++) {
+      var pct = Math.round((i / invs.length) * 88);
+      setProg(pct, 'Page ' + (i+1) + ' / ' + invs.length + ' render ho rhi hai...');
+
+      // Capture this single invoice as canvas
+      var canvas = await capturePageToCanvas(invHTML(invs[i], biz, pdfTpl));
+
+      if (!canvas || canvas.width < 100) {
+        console.warn('Canvas empty for invoice', invs[i].id);
+        continue;
+      }
+
+      // Add page to PDF (except first — jsPDF starts with 1 page)
+      if (i > 0) doc.addPage();
+
+      // Convert canvas to JPEG and add to PDF
+      var imgData = canvas.toDataURL('image/jpeg', 0.95);
+      // Fill full A4 page
+      doc.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
+    }
+
+    setProg(95, 'PDF save ho rhi hai...');
+    await wait(200);
+
+    doc.save('Bulk_Invoices_' + Date.now() + '.pdf');
+    toast('✅ Bulk PDF downloaded! (' + invs.length + ' invoices)');
+    setProg(100, 'Complete! ✅');
+    setTimeout(hidePov, 700);
+
+  } catch (e) {
+    console.error('Bulk PDF error:', e);
+    toast('PDF error: ' + e.message, 3500);
+    hidePov();
+  } finally {
+    window.scrollTo(0, savedScroll);
+    // Safety: remove any leftover containers
+    document.querySelectorAll('[style*="opacity:0.001"]').forEach(function(el) {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// SINGLE PDF
+// ══════════════════════════════════════════════════════════════
+window.dlSingle = async function(i) {
+  if (!window.html2canvas || !window.jspdf) { toast('Libraries load nahi hui, refresh karein'); return; }
+
+  var inv = S.invoices[i];
+  var pdfTpl = (S.tpl === 'premium') ? 'modern' : S.tpl;
+  showPov('PDF ban rhi hai...\n' + inv.id, 20);
+
+  var savedScroll = window.pageYOffset || 0;
+  try {
+    setProg(40, 'Rendering...');
+    var canvas = await capturePageToCanvas(invHTML(inv, S.biz, pdfTpl));
+
+    if (!canvas || canvas.width < 100) { toast('Render failed, dobara try karein'); hidePov(); return; }
+
+    setProg(75, 'PDF generate...');
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    var pdfW = doc.internal.pageSize.getWidth();
+    var pdfH = doc.internal.pageSize.getHeight();
+    doc.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, pdfW, pdfH);
+
+    setProg(90, 'Saving...');
+    doc.save('Invoice_' + inv.id + '.pdf');
+    toast('✅ PDF downloaded!');
+    setProg(100); setTimeout(hidePov, 600);
+
+  } catch(e) {
+    toast('Error: ' + e.message, 3000);
+    hidePov();
+  } finally {
+    window.scrollTo(0, savedScroll);
+    document.querySelectorAll('[style*="opacity:0.001"]').forEach(function(el){if(el.parentNode)el.parentNode.removeChild(el);});
+  }
+};
+
+// ══════════════════════════════════════════════════════════════
+// ALL SEPARATE PDFs
+// ══════════════════════════════════════════════════════════════
+async function dlAllSep() {
+  if (!window.html2canvas || !window.jspdf) { toast('Libraries load nahi hui, refresh karein'); return; }
+  var invs = S.invoices, biz = S.biz;
+  if (!invs.length) { toast('Koi invoice nahi'); return; }
+
+  var pdfTpl = (S.tpl === 'premium') ? 'modern' : S.tpl;
+  var jsPDF = window.jspdf.jsPDF;
+  showPov('0 / ' + invs.length + ' PDF download...', 0);
+
+  var savedScroll = window.pageYOffset || 0;
+  try {
+    for (var i = 0; i < invs.length; i++) {
+      setProg(Math.round(i/invs.length*95), (i+1)+' / '+invs.length+' download ho rhi hai...');
+      var canvas = await capturePageToCanvas(invHTML(invs[i], biz, pdfTpl));
+      if (!canvas || canvas.width < 100) continue;
+      var doc = new jsPDF({ unit:'mm', format:'a4', orientation:'portrait' });
+      doc.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
+      doc.save('Invoice_' + invs[i].id + '.pdf');
+      await wait(400);
+    }
+    toast('✅ Sab ' + invs.length + ' PDFs downloaded!');
+    setProg(100); setTimeout(hidePov, 700);
+  } catch(e) {
+    toast('Error: ' + e.message, 3000); hidePov();
+  } finally {
+    window.scrollTo(0, savedScroll);
+    document.querySelectorAll('[style*="opacity:0.001"]').forEach(function(el){if(el.parentNode)el.parentNode.removeChild(el);});
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// PRINT
+// ══════════════════════════════════════════════════════════════
+window.prtSingle = function(i) {
   var b=document.getElementById('ib-'+i),h=document.getElementById('ich-'+i),p=document.getElementById('ip-'+i);
   if(b&&!b.classList.contains('on')){b.classList.add('on');h.classList.add('on');}
   if(p&&!p.dataset.r){p.innerHTML=invHTML(S.invoices[i],S.biz,S.tpl);p.dataset.r='1';}
   setTimeout(function(){window.print();},200);
 };
-
-// ════════════════════════════════════════════════════
-// BULK PDF — All invoices in ONE file
-// Android Fix: stack pages in opacity:0.001 container
-// Wait 1500ms for ALL pages to render before capture
-// ════════════════════════════════════════════════════
-function dlBulk(){
-  var invs=S.invoices,b=S.biz;
-  if(!invs.length){toast('Koi invoice nahi');return;}
-  showPov('Bulk PDF taiyaar ho rha hai...\n'+invs.length+' invoices',0);
-  setProg(8,'Pages build ho rhe hain...');
-
-  // Use modern/classic for PDF (not premium - dark bg doesn't print well)
-  var pdfTpl=S.tpl==='premium'?'modern':S.tpl;
-
-  // CRITICAL: stack all pages, position:fixed at top:0 left:0, opacity:0.001
-  var cont=document.createElement('div');
-  cont.style.cssText='position:fixed;top:0;left:0;width:794px;background:white;z-index:9997;opacity:0.001;pointer-events:none;overflow:visible;padding:0;margin:0;box-sizing:border-box;';
-
-  invs.forEach(function(inv){
-    var pg=document.createElement('div');
-    pg.style.cssText='width:794px;min-height:1123px;background:white;box-sizing:border-box;overflow:hidden;position:relative;page-break-after:always;break-after:page;zoom:1;transform:none;';
-    pg.innerHTML=invHTML(inv,b,pdfTpl);
-    cont.appendChild(pg);
-  });
-
-  var sv=window.pageYOffset||document.documentElement.scrollTop||0;
-  window.scrollTo(0,0);  // MUST scroll to top before capture
-  document.body.appendChild(cont);
-
-  // Phase 1: Wait for all pages to paint (1500ms is crucial for Android)
-  setTimeout(function(){
-    setProg(35,'Pages render ho rhe hain...');
-    setTimeout(function(){
-      setProg(60,'PDF generate ho rha hai...');
-      html2pdf().set(Object.assign({},POPT,{filename:'Bulk_Invoices_'+Date.now()+'.pdf'}))
-        .from(cont).save()
-        .then(function(){
-          toast('✅ Bulk PDF downloaded! ('+invs.length+' invoices)');
-          setProg(100,'Complete! ✅');
-          setTimeout(hidePov,700);
-        })
-        .catch(function(e){toast('PDF error: '+e.message);hidePov();})
-        .finally(function(){
-          if(cont.parentNode)cont.parentNode.removeChild(cont);
-          window.scrollTo(0,sv);
-        });
-    },300);
-  },1500);
-}
-
-// ════════════════════════════════════════════════════
-// DOWNLOAD ALL SEPARATE — One PDF per invoice
-// Sequential download with progress
-// ════════════════════════════════════════════════════
-function dlAllSep(){
-  var invs=S.invoices,b=S.biz;
-  if(!invs.length){toast('Koi invoice nahi');return;}
-  showPov('1 / '+invs.length+' download ho rhi hai...',0);
-  var idx=0, pdfTpl=S.tpl==='premium'?'modern':S.tpl;
-
-  function next(){
-    if(idx>=invs.length){toast('✅ Sab '+invs.length+' PDFs downloaded!');setTimeout(hidePov,700);return;}
-    var inv=invs[idx];
-    setProg(Math.round(idx/invs.length*100),(idx+1)+' / '+invs.length+' PDF...');
-
-    var cont=makePdfContainer(invHTML(inv,b,pdfTpl),false);
-    window.scrollTo(0,0);
-    document.body.appendChild(cont);
-
-    setTimeout(function(){
-      html2pdf().set(Object.assign({},POPT,{filename:'Invoice_'+inv.id+'.pdf'}))
-        .from(cont).save()
-        .then(function(){if(cont.parentNode)cont.parentNode.removeChild(cont);idx++;setTimeout(next,500);})
-        .catch(function(e){if(cont.parentNode)cont.parentNode.removeChild(cont);toast('Error: '+inv.id);idx++;setTimeout(next,500);});
-    },1000);
-  }
-  next();
-}
-
-// ════════════════════════════════════════════════════
-// PRINT ALL
-// ════════════════════════════════════════════════════
 function prtAll(){
   S.invoices.forEach(function(inv,i){
     var b=document.getElementById('ib-'+i),h=document.getElementById('ich-'+i),p=document.getElementById('ip-'+i);
-    if(b){b.classList.add('on');}if(h){h.classList.add('on');}
+    if(b)b.classList.add('on');if(h)h.classList.add('on');
     if(p&&!p.dataset.r){p.innerHTML=invHTML(inv,S.biz,S.tpl);p.dataset.r='1';}
   });
   setTimeout(function(){window.print();},350);
 }
 
-// ════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 // COPY LINK
-// ════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 function copyLink(){
   var u=window.location.href;
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(u).then(function(){toast('🔗 Link copied!');}).catch(function(){fbCopy(u);});}
@@ -615,16 +523,16 @@ function copyLink(){
 }
 function fbCopy(t){var a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;top:-9999px';document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('🔗 Link copied!');}catch(e){toast('Copy nahi hua');}document.body.removeChild(a);}
 
-// ════════════════════════════════════════════════════
-// BUILD FOOTER
-// ════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+// FOOTER
+// ══════════════════════════════════════════════════════════════
 function buildFooter(){
   var af=document.getElementById('af');af.innerHTML='';
   var bulk=S.invoices.length>1;
   function mk(cls,html,fn){var b=document.createElement('button');b.className='btn '+cls;b.innerHTML=html;b.onclick=fn;af.appendChild(b);}
   if(bulk){
-    mk('btn-g','📄 Bulk PDF (1 file)',dlBulk);
-    mk('btn-b','⬇ All Separate PDFs',dlAllSep);
+    mk('btn-g','📄 Bulk PDF (1 file)',function(){dlBulk();});
+    mk('btn-b','⬇ All Separate PDFs',function(){dlAllSep();});
   } else {
     mk('btn-g','⬇ Download PDF',function(){dlSingle(0);});
   }
