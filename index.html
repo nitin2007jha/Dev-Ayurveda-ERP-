@@ -4313,8 +4313,10 @@ document.addEventListener('DOMContentLoaded', function() {
             setText('summary-subtotal', window.formatCurrency(taxableDisplay, curr));
             setText('summary-tax', window.formatCurrency(taxSum, curr));
             setText('summary-grand', window.formatCurrency(displayAmt, curr));
-            setText('summary-cgst', window.formatCurrency(taxSum/2, curr));
-            setText('summary-sgst', window.formatCurrency(taxSum/2, curr));
+            const cgstAmt = Math.round((taxSum / 2) * 100) / 100;
+            const sgstAmt = Math.round((taxSum - cgstAmt) * 100) / 100;
+            setText('summary-cgst', window.formatCurrency(cgstAmt, curr));
+            setText('summary-sgst', window.formatCurrency(sgstAmt, curr));
             const grandLabel = document.getElementById('net-payable-label');
             if (grandLabel) grandLabel.textContent = showExcl ? 'Net Payable (Excl. GST)' : 'Net Payable';
             const qrWrapper = document.getElementById('qr-image-wrapper');
@@ -5381,7 +5383,8 @@ try {
         });
         const taxableAmt = calcBase;
         const taxAmt = calcTax || Number(inv.totalTax) || 0;
-        const cgst = taxAmt / 2; const sgst = taxAmt / 2;
+        const cgst = Math.round((taxAmt / 2) * 100) / 100;
+        const sgst = Math.round((taxAmt - cgst * 2 + cgst) * 100) / 100; // sgst gets any leftover penny
 
         // Determine text color for premium dark template
         const txtColor = (tpl==='premium') ? 'color:#e2e8f0;' : '';
