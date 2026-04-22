@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Dev Ayurveda ERP</title>
+<title>My Business ERP</title>
 <meta name="theme-color" content="#059669">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -101,6 +101,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
 .btn-ghost:hover{background:#e2e8f0;color:#0f172a}
 .btn-danger{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
 .btn-danger:hover{background:#dc2626;color:#fff}
+.btn-secondary{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}
+.btn-secondary:hover{background:#e2e8f0;color:#0f172a}
 .btn-sm{padding:6px 12px;font-size:12px}
 .btn-icon{padding:7px;border-radius:8px}
 .btn:active{transform:scale(.95)}
@@ -245,6 +247,31 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
 .prod-card{background:#fff;border-radius:12px;border:1px solid #e8ecf0;padding:14px;
   transition:all .2s}
 .prod-card:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.07)}
+/* Mobile scroll hint for invoice items table */
+@media(max-width:767px){
+  .invoice-scroll-wrap{
+    position:relative;
+    background:linear-gradient(to right,#f8fafc 0%,#f8fafc 85%,rgba(16,185,129,.08) 100%);
+  }
+  .invoice-scroll-wrap::after{
+    content:'← scroll →';
+    position:sticky;
+    bottom:6px;left:50%;
+    transform:translateX(-50%);
+    display:block;
+    width:fit-content;
+    background:rgba(5,150,105,.85);
+    color:#fff;
+    font-size:10px;
+    font-weight:700;
+    padding:3px 10px;
+    border-radius:20px;
+    pointer-events:none;
+    opacity:0;
+    transition:opacity .3s;
+  }
+  .invoice-scroll-wrap:hover::after,.invoice-scroll-wrap:focus-within::after{opacity:1;}
+}
 
 /* ── PASSWORD TOGGLE ── */
 .eye-btn{cursor:pointer;color:#94a3b8;transition:color .2s}
@@ -292,7 +319,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
     </div>
     <!-- Title -->
     <div class="text-center">
-      <h1 class="splash-title text-4xl font-black text-white tracking-tight" style="font-family:'Plus Jakarta Sans',sans-serif">Dev Ayurveda</h1>
+      <h1 class="splash-title text-4xl font-black text-white tracking-tight" style="font-family:'Plus Jakarta Sans',sans-serif">My Business</h1>
       <p class="splash-sub text-emerald-400 text-[11px] font-bold uppercase tracking-[.25em] mt-2">Professional ERP System</p>
     </div>
     <!-- Progress bar -->
@@ -403,7 +430,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
             <span class="text-slate-400 text-xs">Step 1 of 3 — Account Setup</span>
           </div>
           <div><label class="lbl text-slate-300">Business Name *</label>
-            <input type="text" id="signup-biz-name" required class="inp bg-white/5 border-white/10 text-white" placeholder="Dev Ayurveda Clinic"></div>
+            <input type="text" id="signup-biz-name" required class="inp bg-white/5 border-white/10 text-white" placeholder="My Business Clinic"></div>
           <div><label class="lbl text-slate-300">Email *</label>
             <input type="email" id="signup-email" required class="inp bg-white/5 border-white/10 text-white" autocomplete="email" placeholder="you@business.com"></div>
           <div><label class="lbl text-slate-300">Password *</label>
@@ -434,9 +461,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
         <div id="adv-signup-form" class="hidden space-y-4">
           <div class="flex items-center gap-2 mb-4">
             <div class="flex gap-1">
-              <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-              <div class="w-2 h-2 rounded-full bg-emerald-500" id="adv-dot-2"></div>
-              <div class="w-2 h-2 rounded-full bg-white/20"></div>
+              <div class="w-2 h-2 rounded-full bg-emerald-500" id="adv-s2-dot-1"></div>
+              <div class="w-2 h-2 rounded-full bg-emerald-500" id="adv-s2-dot-2"></div>
+              <div class="w-2 h-2 rounded-full bg-white/20" id="adv-s2-dot-3"></div>
             </div>
             <span class="text-slate-400 text-xs">Step 2 of 3 — Business Profile</span>
           </div>
@@ -582,13 +609,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
     <div class="modal-head">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center"><i data-lucide="shield-check" class="w-4 h-4 text-blue-600"></i></div>
-        <div><div class="font-bold text-slate-800">Privacy Policy</div><div class="text-xs text-slate-400">Dev Ayurveda ERP · Last updated March 2026</div></div>
+        <div><div class="font-bold text-slate-800">Privacy Policy</div><div class="text-xs text-slate-400">My Business ERP · Last updated March 2026</div></div>
       </div>
       <button onclick="document.getElementById('privacy-modal').classList.remove('open')" class="btn btn-icon btn-ghost"><i data-lucide="x" class="w-4 h-4"></i></button>
     </div>
     <div class="modal-body text-sm text-slate-600 leading-relaxed space-y-4">
       <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-800 text-xs font-medium">
-        📋 By using Dev Ayurveda ERP, you agree to this Privacy Policy.
+        📋 By using My Business ERP, you agree to this Privacy Policy.
       </div>
       <div><h4 class="font-bold text-slate-800 mb-1">1. Data We Collect</h4>
       <p>We collect business data you enter including invoice details, client information, product inventory, expenses, and business settings. This data is stored securely in your Firebase account and locally on your device.</p></div>
@@ -619,14 +646,14 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
     <div class="modal-head">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center"><i data-lucide="leaf" class="w-4 h-4 text-emerald-600"></i></div>
-        <div><div class="font-bold text-slate-800">About Dev Ayurveda ERP</div><div class="text-xs text-emerald-600 font-semibold">Modular Pro · Version 10</div></div>
+        <div><div class="font-bold text-slate-800">About My Business ERP</div><div class="text-xs text-emerald-600 font-semibold">Modular Pro · Version 10</div></div>
       </div>
       <button onclick="document.getElementById('about-modal').classList.remove('open')" class="btn btn-icon btn-ghost"><i data-lucide="x" class="w-4 h-4"></i></button>
     </div>
     <div class="modal-body space-y-4">
       <!-- App Info -->
       <div class="p-4 rounded-xl text-white text-sm" style="background:linear-gradient(135deg,#064e3b,#065f46)">
-        <div class="font-bold text-lg mb-1">🌿 Dev Ayurveda ERP</div>
+        <div class="font-bold text-lg mb-1">🌿 My Business ERP</div>
         <div class="opacity-80 text-xs leading-relaxed">A complete business management system built for Ayurvedic clinics, wellness centers, and service businesses. Manage invoices, inventory, clients, employees and finances — all in one place.</div>
         <div class="mt-3 flex flex-wrap gap-2">
           <span class="bg-white/20 px-2 py-0.5 rounded-lg text-[10px] font-bold">v10 Modular Pro</span>
@@ -698,19 +725,19 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
       <div id="about-shortcuts" class="hidden">
         <div class="grid grid-cols-2 gap-2 text-xs">
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3">
-            <kbd class="bg-white border border-slate-200 rounded-lg px-2 py-1 font-mono font-bold text-slate-700 shadow-sm">Alt+I</kbd>
+            <kbd class="bg-white border border-slate-200 rounded-lg px-2 py-1 font-mono font-bold text-slate-700 shadow-sm">Alt+3</kbd>
             <span class="text-slate-600">New Invoice</span>
           </div>
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3">
-            <kbd class="bg-white border border-slate-200 rounded-lg px-2 py-1 font-mono font-bold text-slate-700 shadow-sm">Alt+D</kbd>
+            <kbd class="bg-white border border-slate-200 rounded-lg px-2 py-1 font-mono font-bold text-slate-700 shadow-sm">Alt+1</kbd>
             <span class="text-slate-600">Dashboard</span>
           </div>
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3">
-            <kbd class="bg-white border border-slate-200 rounded-lg px-2 py-1 font-mono font-bold text-slate-700 shadow-sm">Alt+R</kbd>
+            <kbd class="bg-white border border-slate-200 rounded-lg px-2 py-1 font-mono font-bold text-slate-700 shadow-sm">Alt+4</kbd>
             <span class="text-slate-600">Records</span>
           </div>
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3">
-            <kbd class="bg-white border border-slate-200 rounded-lg px-2 py-1 font-mono font-bold text-slate-700 shadow-sm">Alt+C</kbd>
+            <kbd class="bg-white border border-slate-200 rounded-lg px-2 py-1 font-mono font-bold text-slate-700 shadow-sm">Alt+7</kbd>
             <span class="text-slate-600">Clients</span>
           </div>
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3">
@@ -718,7 +745,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
             <span class="text-slate-600">Add Product</span>
           </div>
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3">
-            <kbd class="bg-white border border-slate-200 rounded-lg px-2 py-1 font-mono font-bold text-slate-700 shadow-sm">Alt+S</kbd>
+            <kbd class="bg-white border border-slate-200 rounded-lg px-2 py-1 font-mono font-bold text-slate-700 shadow-sm">Alt+8</kbd>
             <span class="text-slate-600">Settings</span>
           </div>
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3">
@@ -727,17 +754,25 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
           </div>
           <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3">
             <kbd class="bg-white border border-slate-200 rounded-lg px-2 py-1 font-mono font-bold text-slate-700 shadow-sm">Alt+B</kbd>
-            <span class="text-slate-600">Barcode Scanner</span>
+            <span class="text-slate-600">Bulk PDF Export</span>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3">
+            <kbd class="bg-white border border-slate-200 rounded-lg px-2 py-1 font-mono font-bold text-slate-700 shadow-sm">Alt+S</kbd>
+            <span class="text-slate-600">Save Draft</span>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3">
+            <kbd class="bg-white border border-slate-200 rounded-lg px-2 py-1 font-mono font-bold text-slate-700 shadow-sm">Alt+Z</kbd>
+            <span class="text-slate-600">Focus Product Search</span>
           </div>
           <div class="p-3 col-span-2 bg-amber-50 rounded-xl border border-amber-100 text-amber-700 text-[11px]">
-            💡 <strong>Mobile:</strong> Swipe right from left edge to open sidebar. Tap FAB (+) for quick new invoice.
+            💡 <strong>Mobile:</strong> Swipe right from left edge to open sidebar. Tap FAB (+) for quick new invoice. Full shortcut list in Settings → Keyboard Hotkeys.
           </div>
         </div>
       </div>
 
       <!-- Footer -->
       <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
-        <div class="text-xs text-slate-400">Built with ❤️ for Dev Ayurveda</div>
+        <div class="text-xs text-slate-400">Built with ❤️ for My Business</div>
         <button onclick="document.getElementById('privacy-modal').classList.add('open')" class="text-xs text-blue-600 font-semibold hover:underline">Privacy Policy</button>
       </div>
     </div>
@@ -782,7 +817,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
           <i data-lucide="leaf" class="w-5 h-5 text-white"></i>
         </div>
         <div>
-          <div class="text-white font-bold text-sm leading-tight" id="sidebar-biz-name">Dev Ayurveda</div>
+          <div class="text-white font-bold text-sm leading-tight" id="sidebar-biz-name">My Business</div>
           <div class="text-emerald-500 text-[9px] font-bold uppercase tracking-widest">Modular Pro ERP</div>
         </div>
       </div>
@@ -830,9 +865,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
       </button>
       <span id="page-title" class="font-bold text-slate-800 text-sm flex-1">Dashboard</span>
       <div class="flex items-center gap-2">
-        <div class="hidden sm:flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg">
-          <span class="live-dot"></span>
-          <span class="text-[11px] font-semibold text-emerald-700">Live</span>
+        <div id="topbar-connectivity-pill" class="hidden sm:flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg transition-all">
+          <span id="topbar-live-dot" class="live-dot"></span>
+          <span id="topbar-live-label" class="text-[11px] font-semibold text-emerald-700">Live</span>
         </div>
         <button onclick="window.openTrashModal&&openTrashModal()" class="btn btn-icon btn-ghost relative" title="Recycle Bin">
           <i data-lucide="trash-2" class="w-4 h-4 text-slate-400"></i>
@@ -1102,7 +1137,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
             <i data-lucide="plus" class="w-4 h-4"></i>
           </button>
         </div>
-        <div class="overflow-x-auto rounded-xl border border-slate-100 bg-slate-50" id="invoice-items-wrapper"></div>
+        <div class="overflow-x-auto rounded-xl border border-slate-100 bg-slate-50 invoice-scroll-wrap" id="invoice-items-wrapper" style="-webkit-overflow-scrolling:touch;"></div>
       </div>
       <!-- Notes -->
       <div class="card p-5">
@@ -1126,7 +1161,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
         <div class="space-y-2.5 text-sm">
           <div class="flex justify-between"><span class="text-emerald-200">Taxable Amount</span><span class="font-mono font-semibold" id="summary-subtotal">0.00</span></div>
           <div class="flex justify-between items-center">
-            <span class="text-emerald-200">Discount</span>
+            <span class="text-emerald-200" title="Discount is applied on the taxable base amount (excl. GST)">Discount <span class="text-emerald-400 text-[9px]" style="cursor:help">ⓘ</span></span>
             <div class="flex items-center gap-1">
               <select id="inv-discount-type" onchange="window.updateDraftField('discountType',this.value)" class="bg-white/10 border border-white/20 text-white rounded-lg px-1 py-1 text-xs outline-none"><option value="fixed">Flat</option><option value="percent">%</option></select>
               <input type="number" id="inv-discount" value="0" min="0" oninput="window.updateDraftField('discount',this.value)" class="w-16 bg-white/10 border border-white/20 text-white text-right py-1 px-2 rounded-lg outline-none text-sm">
@@ -1138,6 +1173,13 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
           </div>
           <div class="flex justify-between text-emerald-300 text-xs"><span>CGST</span><span id="summary-cgst">0.00</span></div>
           <div class="flex justify-between text-emerald-300 text-xs pb-3 border-b border-white/10"><span>SGST</span><span id="summary-sgst">0.00</span></div>
+          <div id="summary-igst-row" class="flex justify-between text-emerald-300 text-xs pb-3 border-b border-white/10" style="display:none!important"><span>IGST</span><span id="summary-igst">0.00</span></div>
+          <div class="flex items-center justify-between text-emerald-300 text-xs pb-1">
+            <label class="flex items-center gap-1.5 cursor-pointer select-none">
+              <input type="checkbox" id="inv-igst-toggle" onchange="window.AppState.draft.gstMode=this.checked?'inter':'intra';window.calculateInvoiceTotals&&calculateInvoiceTotals()" class="w-3 h-3 accent-emerald-400">
+              <span class="text-[10px] text-emerald-400">Inter-state (IGST)</span>
+            </label>
+          </div>
           <div class="flex justify-between items-end pt-2">
             <span class="text-emerald-100 text-base font-semibold" id="net-payable-label">Net Payable</span>
             <span class="text-3xl font-bold" id="summary-grand">0.00</span>
@@ -1236,7 +1278,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
     </div>
     <div class="flex gap-2 flex-wrap">
       <input type="file" id="excel-import-input" accept=".xlsx,.xls,.csv" class="hidden" onchange="window.handleExcelImport&&handleExcelImport(event)">
-      <button onclick="document.getElementById('excel-import-input').click()" class="btn btn-ghost btn-sm"><i data-lucide="upload" class="w-3.5 h-3.5"></i> Import</button>
       <button onclick="window.exportInventoryCSV&&exportInventoryCSV()" class="btn btn-ghost btn-sm"><i data-lucide="download" class="w-3.5 h-3.5"></i> CSV</button>
       <button onclick="openProductDrawer(null)" class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add</button>
     </div>
@@ -1305,6 +1346,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
     <div><h2 class="text-xl font-bold text-slate-800">Sales Records</h2><p class="text-slate-400 text-sm">Invoices, Credit Notes, Reports</p></div>
     <div class="flex flex-wrap gap-2">
+      <button onclick="window.openCAShareModal&&openCAShareModal()" class="btn btn-ghost btn-sm text-emerald-700 bg-emerald-50 border-emerald-200"><i data-lucide="link" class="w-3.5 h-3.5"></i> CA Portal Link</button>
       <button onclick="window.openFinancialReports&&openFinancialReports()" class="btn btn-ghost btn-sm text-indigo-700 bg-indigo-50 border-indigo-200"><i data-lucide="bar-chart-2" class="w-3.5 h-3.5"></i> Reports</button>
       <button onclick="setFinancialYear()" class="btn btn-ghost btn-sm text-blue-700 bg-blue-50 border-blue-200"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> FY</button>
       <button onclick="exportCSV()" class="btn btn-ghost btn-sm"><i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> CSV</button>
@@ -1316,10 +1358,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
     <div class="text-xl font-bold text-white" id="records-tax-summary">₹0.00</div>
   </div>
   <div class="card p-4 mb-4">
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3">
       <div class="sm:col-span-2"><label class="lbl">Search</label><div class="relative"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i><input type="text" id="filter-search" placeholder="Invoice ID or Name..." oninput="window.renderRecords&&renderRecords()" class="inp pl-9 text-sm"></div></div>
       <div><label class="lbl">Start Date</label><input type="date" id="filter-start" onchange="window.renderRecords&&renderRecords()" class="inp text-sm"></div>
       <div><label class="lbl">End Date</label><input type="date" id="filter-end" onchange="window.renderRecords&&renderRecords()" class="inp text-sm"></div>
+      <div><label class="lbl">Client</label><select id="filter-client" onchange="window.renderRecords&&renderRecords()" class="inp text-sm bg-white"><option value="">All Clients</option></select></div>
       <div><label class="lbl">Status</label><select id="filter-payment" onchange="window.renderRecords&&renderRecords()" class="inp text-sm bg-white"><option value="">All</option><option value="paid">Paid</option><option value="unpaid">Unpaid</option><option value="refunded">Refunded</option></select></div>
     </div>
   </div>
@@ -1355,7 +1398,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
     <div class="flex items-center gap-4">
       <div class="w-14 h-14 bg-white/10 border border-white/20 rounded-xl overflow-hidden flex items-center justify-center" id="settings-logo-preview"><i data-lucide="building-2" class="w-7 h-7 text-emerald-400"></i></div>
       <div class="flex-1 min-w-0">
-        <div class="text-white font-bold text-base" id="settings-biz-display">Dev Ayurveda</div>
+        <div class="text-white font-bold text-base" id="settings-biz-display">My Business</div>
         <div class="text-emerald-400 text-xs font-medium" id="settings-email-display">...</div>
         <div class="flex gap-2 mt-1.5"><span class="badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px]">Active</span><span class="badge bg-white/10 text-white/60 text-[10px]">Admin</span></div>
       </div>
@@ -1533,6 +1576,103 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
   <button onclick="window.saveSettings&&saveSettings()" class="btn btn-primary w-full justify-center py-3">
     <i data-lucide="save" class="w-4 h-4"></i> Save All Settings
   </button>
+</div>
+
+
+<!-- ===== PURCHASE ORDERS ===== -->
+<div id="view-purchase-orders" class="tab">
+  <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-5">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Purchase Orders</h2>
+      <p class="text-slate-400 text-sm">Vendor orders, GRN & stock updates</p>
+    </div>
+    <button onclick="window.openPODrawer&&openPODrawer(null)" class="btn btn-primary btn-sm">
+      <i data-lucide="plus" class="w-3.5 h-3.5"></i> New PO
+    </button>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5" id="po-stats-row">
+    <div class="stat text-center p-3"><div class="text-xl font-black text-blue-600" id="po-total">0</div><div class="text-xs text-slate-400 mt-1">Total POs</div></div>
+    <div class="stat text-center p-3"><div class="text-xl font-black text-amber-600" id="po-pending">0</div><div class="text-xs text-slate-400 mt-1">Pending</div></div>
+    <div class="stat text-center p-3"><div class="text-xl font-black text-emerald-600" id="po-received">0</div><div class="text-xs text-slate-400 mt-1">Received</div></div>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="po-list">
+    <div class="col-span-full p-10 text-center text-slate-400">
+      <i data-lucide="clipboard-list" class="w-12 h-12 mx-auto mb-3 text-slate-200"></i>
+      <div class="font-semibold mb-1">No purchase orders yet</div>
+      <div class="text-sm">Create a PO to track vendor orders and automatically update inventory on receipt.</div>
+      <button onclick="window.openPODrawer&&openPODrawer(null)" class="btn btn-primary btn-sm mt-4"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Create First PO</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== APPOINTMENTS ===== -->
+<div id="view-appointments" class="tab">
+  <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-5">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Appointments</h2>
+      <p class="text-slate-400 text-sm">Patient queue, slots & token management</p>
+    </div>
+    <div class="flex gap-2">
+      <input type="date" id="appt-date-filter" class="inp w-auto text-sm" onchange="window.renderAppointments&&renderAppointments()">
+      <button onclick="window.openApptDrawer&&openApptDrawer(null)" class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Book</button>
+    </div>
+  </div>
+  <!-- Token display -->
+  <div class="card p-4 mb-4 border-emerald-200 bg-emerald-50/30">
+    <div class="flex items-center justify-between">
+      <div>
+        <div class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Now Serving</div>
+        <div class="text-4xl font-black text-emerald-700" id="appt-current-token">—</div>
+      </div>
+      <div class="text-right">
+        <div class="text-xs text-slate-400 mb-1">Next Token</div>
+        <div class="text-2xl font-black text-slate-600" id="appt-next-token">—</div>
+      </div>
+      <button onclick="window.callNextToken&&callNextToken()" class="btn btn-primary px-6 py-3 text-base font-bold">
+        <i data-lucide="arrow-right-circle" class="w-5 h-5"></i> Next
+      </button>
+    </div>
+  </div>
+  <!-- Today's queue -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+    <div class="stat text-center p-3"><div class="text-xl font-black text-blue-600" id="appt-total-today">0</div><div class="text-xs text-slate-400 mt-1">Today's Bookings</div></div>
+    <div class="stat text-center p-3"><div class="text-xl font-black text-amber-600" id="appt-waiting">0</div><div class="text-xs text-slate-400 mt-1">Waiting</div></div>
+    <div class="stat text-center p-3"><div class="text-xl font-black text-emerald-600" id="appt-done">0</div><div class="text-xs text-slate-400 mt-1">Completed</div></div>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="appt-list">
+    <div class="col-span-full p-8 text-center text-slate-400">
+      <i data-lucide="calendar-check" class="w-12 h-12 mx-auto mb-3 text-slate-200"></i>
+      <div class="font-semibold">No appointments today</div>
+      <button onclick="window.openApptDrawer&&openApptDrawer(null)" class="btn btn-primary btn-sm mt-3"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Book First Appointment</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MULTI-BRANCH ===== -->
+<div id="view-branches" class="tab">
+  <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-5">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800">Branches</h2>
+      <p class="text-slate-400 text-sm">Manage multiple locations from one account</p>
+    </div>
+    <button onclick="window.openBranchModal&&openBranchModal()" class="btn btn-primary btn-sm"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Branch</button>
+  </div>
+  <div class="card p-5 mb-4 border-emerald-200 bg-emerald-50/30">
+    <div class="flex items-center gap-3 mb-3">
+      <div class="w-9 h-9 bg-emerald-100 rounded-xl flex items-center justify-center"><i data-lucide="building-2" class="w-5 h-5 text-emerald-600"></i></div>
+      <div><div class="font-bold text-slate-800 text-sm">Active Branch</div><div class="text-xs text-emerald-600 font-medium" id="active-branch-name">Main Branch</div></div>
+    </div>
+    <div class="text-xs text-slate-500">All invoices, inventory and reports belong to the active branch. Switch branches below.</div>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="branches-list">
+    <div class="card p-4 border-emerald-300 border-2">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white font-black text-base">M</div>
+        <div><div class="font-bold text-slate-800">Main Branch</div><div class="text-xs text-emerald-600 font-semibold">✓ Active</div></div>
+      </div>
+      <div class="text-xs text-slate-400">Primary location — all existing data belongs here.</div>
+    </div>
+  </div>
 </div>
 
 <!-- ===== AI REPORT ===== -->
@@ -1820,9 +1960,6 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
     </button>
   </div>
 </div>
-    </button>
-  </div>
-</div>
 
 
 <!-- Employee Drawer -->
@@ -1983,13 +2120,11 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
       </div>
       <div class="flex gap-2 flex-wrap">
         <button onclick="openTemplateGallery();window._previewOpen=true" class="btn btn-ghost btn-sm"><i data-lucide="layout-template" class="w-3.5 h-3.5"></i> Templates</button>
-        <button onclick="sharePreviewWA()" class="btn btn-sm" style="background:#25D366;color:white;border:none"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WA Share</button>
-        <button onclick="downloadPreviewPDF()" class="btn btn-ghost btn-sm"><i data-lucide="download" class="w-3.5 h-3.5"></i> PDF Download</button>
         <button onclick="window.confirmFinalize&&confirmFinalize()" class="btn btn-primary btn-sm"><i data-lucide="check-circle" class="w-4 h-4"></i> Confirm & Finalize</button>
         <button onclick="closeInvoicePreview()" class="btn btn-ghost btn-sm"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>
     </div>
-    <div class="modal-body bg-slate-200 p-2" id="preview-modal-body" style="overflow:hidden;">
+    <div class="modal-body bg-slate-200 p-2" id="preview-modal-body" style="overflow-y:auto;-webkit-overflow-scrolling:touch;">
       <div id="preview-render-area" class="bg-white shadow-xl text-slate-800 leading-relaxed" style="width:210mm;min-height:297mm;padding:8mm 10mm;font-size:11px;margin:0 auto;"></div>
     </div>
   </div>
@@ -2218,7 +2353,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:#f0f2f5;color:#0f172a
 </div>
 
 <!-- Bulk PDF / PDF Loading -->
-<div id="bulk-render-container" style="position:fixed;top:-9999px;left:-9999px;width:210mm;background:white;pointer-events:none;z-index:-9999;"><div id="bulk-render-area" style="width:210mm;background:white;"></div></div>
+<div id="bulk-render-container" style="position:fixed;top:0;left:0;width:794px;background:white;pointer-events:none;z-index:9990;opacity:0.001;overflow:visible;"><div id="bulk-render-area" style="width:794px;background:white;"></div></div>
 <div id="pdf-loading-overlay" class="fixed inset-0 z-[9999] bg-white hidden flex-col items-center justify-center">
   <i data-lucide="loader-2" class="w-12 h-12 text-emerald-600 animate-spin mb-4"></i>
   <h2 class="text-2xl font-bold text-slate-800 mb-2">Generating PDF...</h2>
@@ -2309,6 +2444,29 @@ function updateFabPos() {
 }
 window.addEventListener('resize', updateFabPos);
 document.addEventListener('DOMContentLoaded', updateFabPos);
+
+// ── CONNECTIVITY INDICATOR ──
+function updateConnectivityUI(isOnline) {
+    var pill = document.getElementById('topbar-connectivity-pill');
+    var dot  = document.getElementById('topbar-live-dot');
+    var lbl  = document.getElementById('topbar-live-label');
+    if(!pill || !dot || !lbl) return;
+    if(isOnline) {
+        pill.className = 'hidden sm:flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg transition-all';
+        dot.style.background = '#10b981';
+        lbl.textContent = 'Live';
+        lbl.className = 'text-[11px] font-semibold text-emerald-700';
+    } else {
+        pill.className = 'hidden sm:flex items-center gap-1.5 bg-amber-50 border border-amber-300 px-2.5 py-1.5 rounded-lg transition-all';
+        dot.style.background = '#f59e0b';
+        dot.style.animationName = 'none';
+        lbl.textContent = 'Offline';
+        lbl.className = 'text-[11px] font-semibold text-amber-700';
+    }
+}
+window.addEventListener('online',  function(){ updateConnectivityUI(true);  window.showToast && window.showToast('Back online ✅', 'success'); });
+window.addEventListener('offline', function(){ updateConnectivityUI(false); window.showToast && window.showToast('No internet — working offline', 'warning'); });
+document.addEventListener('DOMContentLoaded', function(){ updateConnectivityUI(navigator.onLine); });
 
 // ── MODAL HELPERS ──
 function closeInvModal() {
@@ -2598,7 +2756,7 @@ async function shareInvoiceWA() {
     var inv = window.AppState && window.AppState.invoices.find(function(i){ return i.id === id; });
     if(!inv) return;
 
-    var biz = (window.AppState.settings && window.AppState.settings.businessName) || 'Dev Ayurveda ';
+    var biz = (window.AppState.settings && window.AppState.settings.businessName) || 'My Business ';
     var fmt = window.formatCurrency || function(a){ return '₹' + Number(a).toFixed(2); };
     var msg = '🌿 *' + biz + '*'
         + '\n\nHello ' + inv.client.name + ','
@@ -3153,7 +3311,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const products = window.AppState.products || [];
                 const expenses = window.AppState.expenses || [];
                 const s = window.AppState.settings || {};
-                const bizName = s.businessName || 'Dev Ayurveda';
+                const bizName = s.businessName || 'My Business';
                 const now = new Date().toLocaleString('en-IN');
 
                 // Helper: add sheet with header styling info
@@ -3528,6 +3686,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const container = document.getElementById('toast-container');
             if (!container) return;
 
+            // Limit to 3 visible toasts — remove oldest if exceeded
+            const existing = container.querySelectorAll('div');
+            if(existing.length >= 3) { existing[0].remove(); }
+
             const toast = document.createElement('div');
             const bgColor = type === 'error' ? 'bg-red-600' : (type === 'warning' ? 'bg-amber-500' : 'bg-emerald-600');
             const icon = type === 'error' ? 'alert-circle' : (type === 'warning' ? 'alert-triangle' : 'check-circle');
@@ -3551,10 +3713,13 @@ document.addEventListener('DOMContentLoaded', function() {
             { id: 'invoice', icon: 'file-plus', label: 'Invoice', desktopOnly: false, mobileHidden: true },
             { id: 'records', icon: 'file-text', label: 'Records' }, 
             { id: 'inventory', icon: 'box', label: 'Inventory' },
+            { id: 'purchase-orders', icon: 'clipboard-list', label: 'Purchase Orders' },
+            { id: 'appointments', icon: 'calendar-check', label: 'Appointments' },
             { id: 'services', icon: 'sparkles', label: 'Services' },
             { id: 'expenses', icon: 'receipt', label: 'Expenses', class: 'feat-expenses' },
             { id: 'clients', icon: 'users', label: 'Clients' }, 
             { id: 'employees', icon: 'user-check', label: 'Employees' },
+            { id: 'branches', icon: 'building-2', label: 'Branches' },
             { id: 'gst', icon: 'landmark', label: 'GST Filing' },
             { id: 'ai-report', icon: 'bar-chart-2', label: 'AI Report' },
             { id: 'settings', icon: 'settings', label: 'Settings' }
@@ -4173,7 +4338,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td class="p-4 text-right font-bold text-emerald-600">${r.in > 0 ? formatINR(r.in) : '-'}</td>
                     <td class="p-4 text-right font-bold text-red-600">${r.out > 0 ? formatINR(r.out) : '-'}</td>
                 </tr>
-            `).join('') || '<tr><td colspan="5" class="p-8 text-center text-slate-400">No journal entries found for this date.</td></tr>');
+            `).join('') || `<tr><td colspan="5" class="p-10 text-center">
+                <div class="flex flex-col items-center gap-3">
+                    <div class="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center"><i data-lucide="calendar-x" class="w-6 h-6 text-slate-400"></i></div>
+                    <div class="font-semibold text-slate-500">No entries for ${filterDate}</div>
+                    <div class="text-xs text-slate-400">No invoices or expenses recorded on this day.</div>
+                    <button onclick="window.switchTab&&switchTab('invoice')" class="btn btn-primary btn-sm mt-1"><i data-lucide="file-plus" class="w-3.5 h-3.5"></i> Create Invoice</button>
+                </div>
+            </td></tr>`);
         }
 
         window.toggleExpenseModal = function(show) {
@@ -4363,6 +4535,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             ${nameCell}
                             ${(window.isFeatureEnabled('batch') && (item.batch || item.expiry) && !item.isManual) ? `<br><span class="text-[9px] text-slate-400">B:${item.batch||'-'} E:${item.expiry||'-'}</span>` : ''}
                             ${item.isManual ? '<span class="text-[9px] text-emerald-500 font-bold">✏ Custom</span>' : ''}
+                            ${item.isCreditReturn ? '<span class="text-[9px] text-red-500 font-bold">↩ Return</span>' : ''}
                         </td>
                         ${window.isFeatureEnabled('hsn') ? `<td class="p-3"><input type="text" class="w-16 p-1 border border-slate-200 rounded outline-none text-xs" value="${item.hsn||''}" onchange="window.updateDraftItem('${item.id}','hsn',this.value)" placeholder="HSN"></td>` : ''}
                         <td class="p-3"><input type="number" min="1" class="w-16 p-1 border border-slate-200 rounded outline-none" value="${item.qty}" oninput="window.updateDraftItem('${item.id}','qty',this.value)"></td>
@@ -4422,7 +4595,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const inv = window.AppState.invoices.find(i => i.id === id); if(!inv) return; 
             const cnDraft = JSON.parse(JSON.stringify(inv));
             cnDraft.id = window.getNextInvoiceId(); cnDraft.docType = 'Credit Note'; cnDraft.status = 'draft';
-            cnDraft.items = cnDraft.items.map(item => ({...item, qty: -Math.abs(item.qty)}));
+            // Keep positive qty — the negative total is handled by the Credit Note doc type
+            // Negative qty caused "-3" to show in PDF which looks unprofessional
+            cnDraft.items = cnDraft.items.map(item => ({...item, qty: Math.abs(item.qty), isCreditReturn: true}));
+            cnDraft.isCreditNote = true;
             window.AppState.draft = cnDraft; window.switchTab('invoice'); window.showToast("Credit Note Generated as Draft");
         }
 
@@ -4574,27 +4750,538 @@ try {
         }
 
         window.togglePaymentStatus = async function(id, current) { await updateDoc(doc(db, 'artifacts', appId, 'users', window.AppState.user.uid, 'invoices', id), { paymentStatus: current === 'paid' ? 'unpaid' : 'paid' }); }
+
+        // ── RECORD ACTIONS: mobile-friendly dropdown ──────────────────────────
+        window.renderRecordActions = function(inv) {
+            if(inv.status === 'draft') {
+                return `<div class="flex items-center gap-1 justify-center">
+                    <button onclick="window.resumeDraft('${inv.id}')" class="px-2 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 rounded text-xs font-bold transition-colors">Resume</button>
+                    ${window.isFeatureEnabled('deleteBtn') ? `<button onclick="window.softDeleteInvoice('${inv.id}')" class="p-1.5 text-slate-400 hover:text-red-500" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+                </div>`;
+            }
+            const id = inv.id;
+            // Always-visible primary action + ⋯ overflow menu
+            return `<div class="flex items-center gap-1 justify-center">
+                <button onclick="window.viewInvoice('${id}')" class="px-2 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 rounded text-xs font-bold transition-colors">View</button>
+                <button onclick="window.shareWhatsApp('${id}')" title="WhatsApp" class="p-1.5 text-slate-400 hover:text-green-500 hidden sm:inline-flex"><i data-lucide="message-circle" class="w-4 h-4"></i></button>
+                <div class="relative inline-block rec-action-wrap">
+                    <button onclick="window.toggleRecMenu('${id}',this)" class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors" title="More actions">
+                        <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                    </button>
+                    <div id="rec-menu-${id}" class="hidden absolute right-0 top-full mt-1 w-44 bg-white border border-slate-200 rounded-xl shadow-xl z-50 py-1 text-sm">
+                        <button onclick="window.shareWhatsApp('${id}');window.closeAllRecMenus()" class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-2 text-slate-700 sm:hidden"><i data-lucide="message-circle" class="w-3.5 h-3.5 text-green-500"></i> WhatsApp</button>
+                        <button onclick="window.duplicateInvoice('${id}');window.closeAllRecMenus()" class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-2 text-slate-700"><i data-lucide="copy" class="w-3.5 h-3.5 text-blue-500"></i> Duplicate</button>
+                        <button onclick="window.openEditInvoiceModal('${id}');window.closeAllRecMenus()" class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-2 text-slate-700"><i data-lucide="edit-3" class="w-3.5 h-3.5 text-emerald-500"></i> Edit No./Date</button>
+                        ${window.isFeatureEnabled('creditNote') ? `<button onclick="window.issueCreditNote('${id}');window.closeAllRecMenus()" class="w-full text-left px-3 py-2 hover:bg-slate-50 flex items-center gap-2 text-slate-700"><i data-lucide="file-minus" class="w-3.5 h-3.5 text-purple-500"></i> Credit Note</button>` : ''}
+                        <div class="border-t border-slate-100 my-1"></div>
+                        <button onclick="window.voidInvoice('${id}');window.closeAllRecMenus()" class="w-full text-left px-3 py-2 hover:bg-red-50 flex items-center gap-2 text-red-500"><i data-lucide="ban" class="w-3.5 h-3.5"></i> Void</button>
+                        ${window.isFeatureEnabled('deleteBtn') ? `<button onclick="window.softDeleteInvoice('${id}');window.closeAllRecMenus()" class="w-full text-left px-3 py-2 hover:bg-red-50 flex items-center gap-2 text-red-500"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Delete</button>` : ''}
+                    </div>
+                </div>
+            </div>`;
+        };
+
+        window.toggleRecMenu = function(id, btn) {
+            window.closeAllRecMenus();
+            var menu = document.getElementById('rec-menu-' + id);
+            if(menu) { menu.classList.toggle('hidden'); }
+            // Close on outside click
+            setTimeout(function() {
+                document.addEventListener('click', window._recMenuOutside = function(e) {
+                    if(!e.target.closest('.rec-action-wrap')) { window.closeAllRecMenus(); }
+                }, { once: true });
+            }, 0);
+        };
+        window.closeAllRecMenus = function() {
+            document.querySelectorAll('[id^="rec-menu-"]').forEach(function(m){ m.classList.add('hidden'); });
+        };
+
+        // ══════════════════════════════════════════════════════════════
+        // CA PORTAL SHARE MODAL
+        // ══════════════════════════════════════════════════════════════
+        window.openCAShareModal = function() {
+            var uid = window.AppState && window.AppState.user && window.AppState.user.uid;
+            if(!uid) return window.showToast('Please login first','error');
+            var modal = document.getElementById('ca-share-modal');
+            if(!modal) {
+                modal = document.createElement('div');
+                modal.id = 'ca-share-modal';
+                modal.className = 'modal';
+                modal.onclick = function(e){ if(e.target===modal) modal.classList.remove('open'); };
+                var caPortalUrl = 'https://nj1637.github.io/my-invoice/';
+                var shareLink = caPortalUrl + '?uid=' + encodeURIComponent(uid) + '&biz=' + encodeURIComponent((window.AppState.settings||{}).businessName||'My Business');
+                modal.innerHTML = `
+                <div class="modal-box max-w-md w-full">
+                  <div class="modal-head">
+                    <div class="flex items-center gap-3">
+                      <div class="w-9 h-9 bg-emerald-50 rounded-xl flex items-center justify-center"><i data-lucide="link" class="w-4 h-4 text-emerald-600"></i></div>
+                      <div><div class="font-bold text-slate-800">CA / Accountant Portal</div><div class="text-xs text-slate-400">Share read-only access with your CA</div></div>
+                    </div>
+                    <button onclick="document.getElementById('ca-share-modal').classList.remove('open')" class="btn btn-icon btn-ghost"><i data-lucide="x" class="w-4 h-4"></i></button>
+                  </div>
+                  <div class="modal-body space-y-4">
+                    <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
+                      <div class="font-bold text-emerald-800 text-sm mb-1">🔗 Your CA Portal Link</div>
+                      <p class="text-xs text-emerald-700 mb-3">Share this link with your CA or accountant. They get read-only access to view invoices, reports & GST data — no login needed on their side.</p>
+                      <div class="flex gap-2">
+                        <input type="text" id="ca-link-input" value="${shareLink}" readonly class="inp text-xs bg-white flex-1">
+                        <button onclick="window.copyCALink()" class="btn btn-primary btn-sm"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy</button>
+                      </div>
+                    </div>
+                    <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl">
+                      <div class="font-bold text-blue-800 text-sm mb-2">📋 What your CA can see:</div>
+                      <ul class="text-xs text-blue-700 space-y-1">
+                        <li>✅ All finalized invoices (view + download PDF)</li>
+                        <li>✅ GST summary — CGST, SGST, ITC</li>
+                        <li>✅ Monthly P&L and expense reports</li>
+                        <li>✅ GSTR-1 & GSTR-3B data</li>
+                        <li>❌ Cannot edit, void, or delete anything</li>
+                      </ul>
+                    </div>
+                    <div class="flex gap-2">
+                      <button onclick="window.shareCALinkWA()" class="btn flex-1 justify-center" style="background:#25D366;color:white;border:none"><i data-lucide="message-circle" class="w-4 h-4"></i> Send via WhatsApp</button>
+                      <button onclick="window.copyCALink()" class="btn btn-ghost flex-1 justify-center"><i data-lucide="link" class="w-4 h-4"></i> Copy Link</button>
+                    </div>
+                  </div>
+                </div>`;
+                document.body.appendChild(modal);
+                if(typeof lucide !== 'undefined') lucide.createIcons();
+            }
+            modal.classList.add('open');
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        };
+        window.copyCALink = function() {
+            var inp = document.getElementById('ca-link-input');
+            if(inp) { navigator.clipboard.writeText(inp.value).then(function(){ window.showToast('Link copied! ✅'); }).catch(function(){ inp.select(); document.execCommand('copy'); window.showToast('Link copied! ✅'); }); }
+        };
+        window.shareCALinkWA = function() {
+            var inp = document.getElementById('ca-link-input');
+            var biz = (window.AppState.settings||{}).businessName || 'My Business';
+            var msg = '🌿 *' + biz + '* — CA Portal Access\n\nNamaste! Please use this link to view our invoices and GST reports:\n\n' + (inp ? inp.value : '') + '\n\nYou can view all invoices, download PDFs, and access GST summaries. Read-only access.';
+            window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+        };
+
+        // ══════════════════════════════════════════════════════════════
+        // IGST TOGGLE — Invoice (Inter-State)
+        // ══════════════════════════════════════════════════════════════
+        window.getGSTMode = function() {
+            return window.AppState && window.AppState.draft && window.AppState.draft.gstMode || 'intra'; // intra=CGST+SGST, inter=IGST
+        };
+        // Patch calculateInvoiceTotals to support IGST
+        (function() {
+            var _orig = window.calculateInvoiceTotals;
+            window.calculateInvoiceTotals = function() {
+                var result = _orig ? _orig() : {subtotal:0,totalTax:0,grandTotal:0};
+                var mode = window.getGSTMode();
+                var cgstEl = document.getElementById('summary-cgst');
+                var sgstEl = document.getElementById('summary-sgst');
+                var igstRow = document.getElementById('summary-igst-row');
+                if(mode === 'inter') {
+                    if(cgstEl) cgstEl.closest('div') && (cgstEl.closest('div').style.display='none');
+                    if(sgstEl) sgstEl.closest('div') && (sgstEl.closest('div').style.display='none');
+                    if(igstRow) igstRow.style.display='flex';
+                    var igstEl = document.getElementById('summary-igst');
+                    if(igstEl && window.formatCurrency) igstEl.textContent = window.formatCurrency(result.totalTax, window.AppState.draft.currency||'INR');
+                } else {
+                    if(cgstEl) cgstEl.closest('div') && (cgstEl.closest('div').style.display='');
+                    if(sgstEl) sgstEl.closest('div') && (sgstEl.closest('div').style.display='');
+                    if(igstRow) igstRow.style.display='none';
+                }
+                return result;
+            };
+        })();
+
+        // ══════════════════════════════════════════════════════════════
+        // PURCHASE ORDERS MODULE
+        // ══════════════════════════════════════════════════════════════
+        window.AppState.purchaseOrders = window.AppState.purchaseOrders || [];
         
+        window.renderPurchaseOrders = function() {
+            var pos = window.AppState.purchaseOrders || [];
+            var total = pos.length;
+            var pending = pos.filter(function(p){ return p.status === 'pending' || p.status === 'partial'; }).length;
+            var received = pos.filter(function(p){ return p.status === 'received'; }).length;
+            var setText = window._setText || function(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; };
+            setText('po-total', total);
+            setText('po-pending', pending);
+            setText('po-received', received);
+            if(pos.length === 0) {
+                document.getElementById('po-list').innerHTML = `<div class="col-span-full p-10 text-center text-slate-400"><i data-lucide="clipboard-list" class="w-12 h-12 mx-auto mb-3 text-slate-200"></i><div class="font-semibold mb-1">No purchase orders yet</div><button onclick="window.openPODrawer&&openPODrawer(null)" class="btn btn-primary btn-sm mt-4"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Create First PO</button></div>`;
+                if(typeof lucide !== 'undefined') lucide.createIcons();
+                return;
+            }
+            var html = pos.map(function(po) {
+                var statusColor = po.status==='received' ? 'bg-emerald-100 text-emerald-700' : po.status==='partial' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700';
+                return `<div class="card p-4">
+                    <div class="flex items-start justify-between mb-3">
+                        <div><div class="font-bold text-slate-800 text-sm">${po.vendor||'Unknown Vendor'}</div><div class="text-xs text-slate-400">${po.date} · PO-${po.id}</div></div>
+                        <span class="badge ${statusColor} text-[10px] capitalize">${po.status}</span>
+                    </div>
+                    <div class="text-sm text-slate-600 mb-3">${(po.items||[]).length} item(s) · ₹${Number(po.totalAmount||0).toLocaleString('en-IN')}</div>
+                    <div class="flex gap-2">
+                        ${po.status !== 'received' ? `<button onclick="window.receivePO('${po.id}')" class="btn btn-primary btn-sm flex-1 justify-center text-xs"><i data-lucide="package-check" class="w-3 h-3"></i> Receive GRN</button>` : '<span class="text-xs text-emerald-600 font-bold flex items-center gap-1"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Received</span>'}
+                        <button onclick="window.deletePO('${po.id}')" class="btn btn-icon btn-ghost btn-sm text-red-400 hover:text-red-600"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+            document.getElementById('po-list').innerHTML = html;
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        };
+
+        window.openPODrawer = function(id) {
+            var existing = document.getElementById('po-drawer');
+            if(existing) { existing.classList.add('open'); document.getElementById('po-drawer-bg') && document.getElementById('po-drawer-bg').classList.add('open'); return; }
+            // Create PO drawer dynamically
+            var bg = document.createElement('div'); bg.id='po-drawer-bg'; bg.className='drawer-bg'; bg.onclick=window.closePODrawer; document.body.appendChild(bg);
+            var drawer = document.createElement('div'); drawer.id='po-drawer'; drawer.className='drawer';
+            drawer.innerHTML = `
+            <div class="drawer-head"><div class="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center mr-3"><i data-lucide="clipboard-list" class="w-5 h-5 text-blue-600"></i></div><div class="flex-1"><div class="font-bold text-slate-800">New Purchase Order</div><div class="text-xs text-slate-400">Order from vendor</div></div><button onclick="window.closePODrawer()" class="btn btn-icon btn-ghost"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+            <div class="drawer-body space-y-4">
+                <div><label class="lbl">Vendor Name *</label><input type="text" id="po-vendor" class="inp" placeholder="Supplier / Distributor name"></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="lbl">PO Date</label><input type="date" id="po-date" class="inp"></div>
+                    <div><label class="lbl">Expected Delivery</label><input type="date" id="po-delivery" class="inp"></div>
+                </div>
+                <div><label class="lbl">Items</label><div id="po-items-list" class="space-y-2 mb-2"></div>
+                    <button onclick="window.addPOItem()" class="btn btn-ghost btn-sm w-full justify-center"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Item</button>
+                </div>
+                <div><label class="lbl">Notes</label><textarea id="po-notes" rows="2" class="inp resize-none" placeholder="Payment terms, delivery instructions..."></textarea></div>
+            </div>
+            <div class="drawer-foot"><button onclick="window.closePODrawer()" class="btn btn-ghost">Cancel</button><button onclick="window.savePO()" class="btn btn-primary"><i data-lucide="save" class="w-4 h-4"></i> Save PO</button></div>`;
+            document.body.appendChild(drawer);
+            document.getElementById('po-date').value = new Date().toISOString().split('T')[0];
+            window.addPOItem();
+            setTimeout(function(){ bg.classList.add('open'); drawer.classList.add('open'); if(typeof lucide!=='undefined') lucide.createIcons(); }, 10);
+        };
+        window.closePODrawer = function() { var d=document.getElementById('po-drawer'), b=document.getElementById('po-drawer-bg'); if(d)d.classList.remove('open'); if(b)b.classList.remove('open'); };
+        window._poItemCount = 0;
+        window.addPOItem = function() {
+            var list = document.getElementById('po-items-list'); if(!list) return;
+            var idx = ++window._poItemCount;
+            var div = document.createElement('div'); div.className='grid grid-cols-3 gap-2 items-end'; div.id='po-item-'+idx;
+            div.innerHTML = `<div><input type="text" class="inp text-sm" placeholder="Product name" id="poi-name-${idx}"></div><div><input type="number" class="inp text-sm" placeholder="Qty" id="poi-qty-${idx}" min="1" value="1"></div><div class="flex gap-1"><input type="number" class="inp text-sm" placeholder="Cost ₹" id="poi-cost-${idx}" min="0"><button onclick="document.getElementById('po-item-${idx}').remove()" class="btn btn-icon btn-ghost text-red-400 flex-shrink-0"><i data-lucide="x" class="w-4 h-4"></i></button></div>`;
+            list.appendChild(div);
+            if(typeof lucide!=='undefined') lucide.createIcons();
+        };
+        window.savePO = function() {
+            var vendor = document.getElementById('po-vendor') && document.getElementById('po-vendor').value.trim();
+            if(!vendor) return window.showToast('Vendor name required','error');
+            var items = []; var total = 0;
+            document.querySelectorAll('[id^="po-item-"]').forEach(function(row) {
+                var idx = row.id.split('-')[2];
+                var name = document.getElementById('poi-name-'+idx) && document.getElementById('poi-name-'+idx).value;
+                var qty = Number(document.getElementById('poi-qty-'+idx) && document.getElementById('poi-qty-'+idx).value||0);
+                var cost = Number(document.getElementById('poi-cost-'+idx) && document.getElementById('poi-cost-'+idx).value||0);
+                if(name) { items.push({name,qty,cost}); total += qty*cost; }
+            });
+            if(items.length===0) return window.showToast('Add at least one item','error');
+            var po = { id: Date.now().toString(), vendor, date: document.getElementById('po-date').value, deliveryDate: document.getElementById('po-delivery').value, notes: document.getElementById('po-notes').value, items, totalAmount: total, status: 'pending', createdAt: Date.now() };
+            window.AppState.purchaseOrders = window.AppState.purchaseOrders || [];
+            window.AppState.purchaseOrders.unshift(po);
+            window.closePODrawer();
+            window.renderPurchaseOrders && window.renderPurchaseOrders();
+            window.showToast('Purchase Order created! ✅');
+        };
+        window.receivePO = function(id) {
+            var po = (window.AppState.purchaseOrders||[]).find(function(p){ return p.id===id; });
+            if(!po) return;
+            if(!confirm('Mark PO as Received? This will update inventory stock for matching products.')) return;
+            po.status = 'received';
+            po.receivedAt = Date.now();
+            // Auto-update matching inventory
+            var updated = 0;
+            (po.items||[]).forEach(function(item) {
+                var prod = (window.AppState.products||[]).find(function(p){ return p.name.toLowerCase().includes(item.name.toLowerCase()); });
+                if(prod) { prod.stock = (Number(prod.stock)||0) + Number(item.qty||0); updated++; }
+            });
+            window.renderPurchaseOrders && window.renderPurchaseOrders();
+            window.showToast('GRN recorded! ' + (updated>0 ? updated+' product(s) stock updated ✅' : 'No matching products found in inventory.'));
+        };
+        window.deletePO = function(id) {
+            if(!confirm('Delete this Purchase Order?')) return;
+            window.AppState.purchaseOrders = (window.AppState.purchaseOrders||[]).filter(function(p){ return p.id!==id; });
+            window.renderPurchaseOrders && window.renderPurchaseOrders();
+        };
+
+        // ══════════════════════════════════════════════════════════════
+        // APPOINTMENTS / TOKEN QUEUE MODULE
+        // ══════════════════════════════════════════════════════════════
+        window.AppState.appointments = window.AppState.appointments || [];
+        window._currentToken = 0;
+
+        window.renderAppointments = function() {
+            var dateEl = document.getElementById('appt-date-filter');
+            if(!dateEl) return;
+            if(!dateEl.value) dateEl.value = new Date().toISOString().split('T')[0];
+            var today = dateEl.value;
+            var appts = (window.AppState.appointments||[]).filter(function(a){ return a.date === today; });
+            var waiting = appts.filter(function(a){ return a.status==='waiting'; }).length;
+            var done = appts.filter(function(a){ return a.status==='done'; }).length;
+            var setText = function(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; };
+            setText('appt-total-today', appts.length);
+            setText('appt-waiting', waiting);
+            setText('appt-done', done);
+            var currentServing = appts.filter(function(a){ return a.status==='serving'; })[0];
+            var nextWaiting = appts.filter(function(a){ return a.status==='waiting'; })[0];
+            setText('appt-current-token', currentServing ? '#'+currentServing.token+' '+currentServing.name : '—');
+            setText('appt-next-token', nextWaiting ? '#'+nextWaiting.token : '—');
+            if(appts.length === 0) {
+                document.getElementById('appt-list').innerHTML = `<div class="col-span-full p-8 text-center text-slate-400"><i data-lucide="calendar-check" class="w-12 h-12 mx-auto mb-3 text-slate-200"></i><div class="font-semibold">No appointments for ${today}</div><button onclick="window.openApptDrawer&&openApptDrawer(null)" class="btn btn-primary btn-sm mt-3"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Book Appointment</button></div>`;
+                if(typeof lucide!=='undefined') lucide.createIcons(); return;
+            }
+            var statusMap = {waiting:'bg-amber-100 text-amber-700', serving:'bg-blue-100 text-blue-700', done:'bg-emerald-100 text-emerald-700'};
+            var html = appts.sort(function(a,b){ return a.token-b.token; }).map(function(a) {
+                return `<div class="card p-4 ${a.status==='serving'?'border-blue-300 border-2':''}">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex items-center gap-3"><div class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center font-black text-emerald-700 text-sm">#${a.token}</div><div><div class="font-bold text-slate-800 text-sm">${a.name}</div><div class="text-xs text-slate-400">${a.mobile||'—'} · ${a.type||'Consultation'}</div></div></div>
+                        <span class="badge ${statusMap[a.status]||'bg-slate-100 text-slate-500'} text-[10px] capitalize">${a.status}</span>
+                    </div>
+                    ${a.notes ? `<div class="text-xs text-slate-500 italic mb-3">${a.notes}</div>` : ''}
+                    <div class="flex gap-2 pt-2 border-t border-slate-100">
+                        ${a.status==='waiting' ? `<button onclick="window.serveAppt('${a.id}')" class="btn btn-primary btn-sm flex-1 justify-center text-xs">Call In</button>` : ''}
+                        ${a.status==='serving' ? `<button onclick="window.doneAppt('${a.id}')" class="btn btn-sm flex-1 justify-center text-xs" style="background:#059669;color:white">Done ✓</button><button onclick="window.quickApptInvoice('${a.id}')" class="btn btn-ghost btn-sm flex-1 justify-center text-xs"><i data-lucide="file-plus" class="w-3 h-3"></i> Invoice</button>` : ''}
+                        ${a.status==='done' ? '<span class="text-xs text-emerald-600 font-semibold">✅ Completed</span>' : ''}
+                        <button onclick="window.deleteAppt('${a.id}')" class="btn btn-icon btn-ghost btn-sm text-red-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+            document.getElementById('appt-list').innerHTML = html;
+            if(typeof lucide!=='undefined') lucide.createIcons();
+        };
+        window.openApptDrawer = function() {
+            var existing = document.getElementById('appt-drawer');
+            if(existing) { existing.classList.add('open'); document.getElementById('appt-drawer-bg')&&document.getElementById('appt-drawer-bg').classList.add('open'); return; }
+            var bg = document.createElement('div'); bg.id='appt-drawer-bg'; bg.className='drawer-bg'; bg.onclick=window.closeApptDrawer; document.body.appendChild(bg);
+            var drawer = document.createElement('div'); drawer.id='appt-drawer'; drawer.className='drawer';
+            drawer.innerHTML = `
+            <div class="drawer-head"><div class="w-9 h-9 bg-purple-50 rounded-xl flex items-center justify-center mr-3"><i data-lucide="calendar-check" class="w-5 h-5 text-purple-600"></i></div><div class="flex-1"><div class="font-bold text-slate-800">Book Appointment</div><div class="text-xs text-slate-400">Add to today's queue</div></div><button onclick="window.closeApptDrawer()" class="btn btn-icon btn-ghost"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+            <div class="drawer-body space-y-4">
+                <div><label class="lbl">Patient Name *</label><input type="text" id="appt-name" class="inp" placeholder="Full name"></div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="lbl">Mobile</label><input type="tel" id="appt-mobile" class="inp" placeholder="Phone number"></div>
+                    <div><label class="lbl">Date</label><input type="date" id="appt-date" class="inp"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="lbl">Type</label><select id="appt-type" class="inp bg-white"><option>Consultation</option><option>Treatment</option><option>Follow-up</option><option>Panchakarma</option><option>Other</option></select></div>
+                    <div><label class="lbl">Time Slot</label><input type="time" id="appt-time" class="inp"></div>
+                </div>
+                <div><label class="lbl">Notes</label><textarea id="appt-notes" rows="2" class="inp resize-none" placeholder="Symptoms, allergies..."></textarea></div>
+            </div>
+            <div class="drawer-foot"><button onclick="window.closeApptDrawer()" class="btn btn-ghost">Cancel</button><button onclick="window.saveAppt()" class="btn btn-primary"><i data-lucide="calendar-plus" class="w-4 h-4"></i> Book</button></div>`;
+            document.body.appendChild(drawer);
+            document.getElementById('appt-date').value = new Date().toISOString().split('T')[0];
+            setTimeout(function(){ bg.classList.add('open'); drawer.classList.add('open'); if(typeof lucide!=='undefined') lucide.createIcons(); }, 10);
+        };
+        window.closeApptDrawer = function() { var d=document.getElementById('appt-drawer'),b=document.getElementById('appt-drawer-bg'); if(d)d.classList.remove('open'); if(b)b.classList.remove('open'); };
+        window.saveAppt = function() {
+            var name = document.getElementById('appt-name') && document.getElementById('appt-name').value.trim();
+            if(!name) return window.showToast('Patient name required','error');
+            var date = document.getElementById('appt-date').value;
+            var sameDay = (window.AppState.appointments||[]).filter(function(a){ return a.date===date; });
+            var token = sameDay.length + 1;
+            var appt = { id: Date.now().toString(), name, mobile: document.getElementById('appt-mobile').value, date, time: document.getElementById('appt-time').value, type: document.getElementById('appt-type').value, notes: document.getElementById('appt-notes').value, token, status: 'waiting', createdAt: Date.now() };
+            window.AppState.appointments = window.AppState.appointments || [];
+            window.AppState.appointments.push(appt);
+            window.closeApptDrawer();
+            window.renderAppointments && window.renderAppointments();
+            window.showToast('Appointment booked — Token #' + token + ' ✅');
+        };
+        window.serveAppt = function(id) {
+            // Mark current serving as done first
+            (window.AppState.appointments||[]).forEach(function(a){ if(a.status==='serving') a.status='waiting'; });
+            var a = (window.AppState.appointments||[]).find(function(x){ return x.id===id; }); if(a) a.status='serving';
+            window.renderAppointments && window.renderAppointments();
+        };
+        window.doneAppt = function(id) {
+            var a = (window.AppState.appointments||[]).find(function(x){ return x.id===id; }); if(a) a.status='done';
+            window.renderAppointments && window.renderAppointments();
+            window.showToast('Marked as done ✅');
+        };
+        window.callNextToken = function() {
+            var dateEl = document.getElementById('appt-date-filter');
+            var today = dateEl ? dateEl.value : new Date().toISOString().split('T')[0];
+            var waiting = (window.AppState.appointments||[]).filter(function(a){ return a.date===today && a.status==='waiting'; }).sort(function(a,b){ return a.token-b.token; });
+            if(waiting.length===0) return window.showToast('No more patients in queue','warning');
+            (window.AppState.appointments||[]).forEach(function(a){ if(a.status==='serving') a.status='done'; });
+            waiting[0].status = 'serving';
+            window.renderAppointments && window.renderAppointments();
+            window.showToast('Now serving Token #' + waiting[0].token + ' — ' + waiting[0].name);
+        };
+        window.deleteAppt = function(id) {
+            window.AppState.appointments = (window.AppState.appointments||[]).filter(function(a){ return a.id!==id; });
+            window.renderAppointments && window.renderAppointments();
+        };
+        window.quickApptInvoice = function(id) {
+            var a = (window.AppState.appointments||[]).find(function(x){ return x.id===id; }); if(!a) return;
+            window.AppState.draft.client = { name: a.name, mobile: a.mobile||'', gstin:'', address:'' };
+            window.switchTab && window.switchTab('invoice');
+            window.showToast('Invoice pre-filled for '+a.name);
+        };
+
+        // ══════════════════════════════════════════════════════════════
+        // MULTI-BRANCH MODULE
+        // ══════════════════════════════════════════════════════════════
+        window.AppState.branches = window.AppState.branches || [{id:'main', name:'Main Branch', address:'', isDefault:true}];
+        window.AppState.activeBranchId = window.AppState.activeBranchId || 'main';
+
+        window.renderBranches = function() {
+            var branches = window.AppState.branches || [];
+            var active = window.AppState.activeBranchId;
+            var setText = function(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; };
+            var activeBranch = branches.find(function(b){ return b.id===active; }) || branches[0];
+            if(activeBranch) setText('active-branch-name', activeBranch.name);
+            var html = branches.map(function(b) {
+                var isActive = b.id === active;
+                return `<div class="card p-4 ${isActive?'border-emerald-300 border-2':''}">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 ${isActive?'bg-emerald-500':'bg-slate-200'} rounded-xl flex items-center justify-center ${isActive?'text-white':'text-slate-600'} font-black text-base">${b.name.charAt(0).toUpperCase()}</div>
+                        <div><div class="font-bold text-slate-800">${b.name}</div><div class="text-xs ${isActive?'text-emerald-600 font-semibold':'text-slate-400'}">${isActive?'✓ Active':b.address||'No address set'}</div></div>
+                    </div>
+                    <div class="flex gap-2">
+                        ${!isActive ? `<button onclick="window.switchBranch('${b.id}')" class="btn btn-primary btn-sm flex-1 justify-center text-xs">Switch to This</button>` : '<span class="text-xs text-emerald-600 font-semibold py-1">Currently Active</span>'}
+                        ${!b.isDefault ? `<button onclick="window.deleteBranch('${b.id}')" class="btn btn-icon btn-ghost btn-sm text-red-400"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+            document.getElementById('branches-list').innerHTML = html;
+            if(typeof lucide!=='undefined') lucide.createIcons();
+        };
+        window.openBranchModal = function() {
+            var name = prompt('New branch name (e.g. "Muzaffarpur Clinic"):');
+            if(!name || !name.trim()) return;
+            var addr = prompt('Branch address (optional):') || '';
+            var branch = { id: Date.now().toString(), name: name.trim(), address: addr, isDefault: false };
+            window.AppState.branches = window.AppState.branches || [];
+            window.AppState.branches.push(branch);
+            window.renderBranches && window.renderBranches();
+            window.showToast('Branch "' + name + '" added! ✅');
+        };
+        window.switchBranch = function(id) {
+            window.AppState.activeBranchId = id;
+            var b = (window.AppState.branches||[]).find(function(x){ return x.id===id; });
+            window.renderBranches && window.renderBranches();
+            window.showToast('Switched to ' + (b?b.name:'branch') + ' ✅');
+        };
+        window.deleteBranch = function(id) {
+            if(!confirm('Delete this branch? This only removes the branch record, not your data.')) return;
+            window.AppState.branches = (window.AppState.branches||[]).filter(function(b){ return b.id!==id; });
+            if(window.AppState.activeBranchId === id) window.AppState.activeBranchId = 'main';
+            window.renderBranches && window.renderBranches();
+        };
+
+        // ══════════════════════════════════════════════════════════════
+        // LOYALTY POINTS SYSTEM
+        // ══════════════════════════════════════════════════════════════
+        window.getLoyaltyPoints = function(clientName) {
+            var key = 'loyalty_' + (window.AppState.user&&window.AppState.user.uid||'demo') + '_' + clientName;
+            return Number(localStorage.getItem(key)||0);
+        };
+        window.addLoyaltyPoints = function(clientName, invoiceAmount) {
+            var key = 'loyalty_' + (window.AppState.user&&window.AppState.user.uid||'demo') + '_' + clientName;
+            var pts = Number(localStorage.getItem(key)||0);
+            var earned = Math.floor(invoiceAmount / 100); // 1 pt per ₹100
+            localStorage.setItem(key, pts + earned);
+            if(earned > 0) window.showToast('🏆 ' + clientName + ' earned ' + earned + ' loyalty points!');
+        };
+        window.redeemLoyaltyPoints = function(clientName, pointsToRedeem) {
+            var key = 'loyalty_' + (window.AppState.user&&window.AppState.user.uid||'demo') + '_' + clientName;
+            var pts = Number(localStorage.getItem(key)||0);
+            if(pts < pointsToRedeem) { window.showToast('Insufficient points. Balance: ' + pts,'error'); return false; }
+            localStorage.setItem(key, pts - pointsToRedeem);
+            window.showToast('✅ Redeemed ' + pointsToRedeem + ' pts = ₹' + pointsToRedeem + ' discount!');
+            return true;
+        };
+
+        // Auto-award points when invoice is finalized
+        (function() {
+            var _origSave = window.saveInvoice;
+            if(_origSave) {
+                window.saveInvoice = async function(status) {
+                    var result = await _origSave(status);
+                    if(status === 'final' && window.AppState.draft && window.AppState.draft.client && window.AppState.draft.client.name) {
+                        var totals = window.calculateInvoiceTotals ? window.calculateInvoiceTotals() : {grandTotal:0};
+                        window.addLoyaltyPoints(window.AppState.draft.client.name, totals.grandTotal||0);
+                    }
+                    return result;
+                };
+            }
+        })();
+
+        // ══════════════════════════════════════════════════════════════
+        // RENDER HOOKS — wire up tab switches to new modules
+        // ══════════════════════════════════════════════════════════════
+        (function() {
+            var _orig = window.switchTab;
+            window.switchTab = function(tabId) {
+                if(_orig) _orig(tabId);
+                if(tabId === 'purchase-orders') { setTimeout(function(){ window.renderPurchaseOrders && window.renderPurchaseOrders(); }, 50); }
+                if(tabId === 'appointments') { setTimeout(function(){ window.renderAppointments && window.renderAppointments(); }, 50); }
+                if(tabId === 'branches') { setTimeout(function(){ window.renderBranches && window.renderBranches(); }, 50); }
+            };
+        })();
+
         window.renderRecords = function() {
             const searchEl = document.getElementById('filter-search'); const query = searchEl ? searchEl.value.toLowerCase() : ''; 
             const startEl = document.getElementById('filter-start'); const start = startEl ? startEl.value : ''; 
             const endEl = document.getElementById('filter-end'); const end = endEl ? endEl.value : ''; 
             const payEl = document.getElementById('filter-payment'); const payStatus = payEl ? payEl.value : '';
+            const clientEl = document.getElementById('filter-client'); const clientFilter = clientEl ? clientEl.value : '';
+
+            // Populate client dropdown if empty (only options = All Clients)
+            if(clientEl && clientEl.options.length <= 1) { window.populateClientFilter && window.populateClientFilter(); }
             
-            const filtered = window.AppState.invoices.filter(i => { return ((i.id||'').toLowerCase().includes(query) || (i.client.name && i.client.name.toLowerCase().includes(query))) && (start === "" || i.date >= start) && (end === "" || i.date <= end) && (payStatus === "" || (i.paymentStatus || 'unpaid') === payStatus); });
+            const filtered = window.AppState.invoices.filter(i => { return ((i.id||'').toLowerCase().includes(query) || (i.client.name && i.client.name.toLowerCase().includes(query))) && (start === "" || i.date >= start) && (end === "" || i.date <= end) && (payStatus === "" || (i.paymentStatus || 'unpaid') === payStatus) && (clientFilter === "" || (i.client && i.client.name === clientFilter)); });
             
             const collectedTax = filtered.filter(i => i.status === 'final' && i.docType === 'Tax Invoice' && i.status !== 'void').reduce((sum, i) => sum + (Number(i.totalTax) || 0), 0);
             setText('records-tax-summary', formatINR(collectedTax));
 
-            setHTML('records-list', filtered.map(inv => `<tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors bg-white ${inv.status==='void'?'opacity-50':''}"><td class="p-4 font-mono text-emerald-700 text-sm ${inv.status==='void'?'line-through':''}">${inv.id}</td><td class="p-4 text-xs font-bold text-slate-500 uppercase">${inv.docType || 'Tax Invoice'}</td><td class="p-4 text-slate-600 text-sm whitespace-nowrap">${inv.date}</td><td class="p-4 font-medium text-slate-800 text-sm truncate max-w-[150px]">${inv.client.name}</td><td class="p-4 text-right font-bold ${inv.docType === 'Credit Note' ? 'text-red-600' : 'text-slate-800'} ${inv.status==='void'?'line-through text-slate-400':''}">${window.formatCurrency(inv.grandTotal, inv.currency)}</td><td class="p-4 text-center">${inv.status === 'draft' || inv.docType === 'Credit Note' || inv.status === 'void' ? `<span class="text-[10px] text-slate-400 font-bold uppercase">${inv.status==='void'?'VOID':'N/A'}</span>` : `<button onclick="window.togglePaymentStatus('${inv.id}', '${inv.paymentStatus || 'unpaid'}')" class="text-[10px] uppercase font-bold px-3 py-1.5 rounded-full transition-colors ${inv.paymentStatus === 'paid' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 shadow-sm' : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'}">${inv.paymentStatus === 'paid' ? 'Paid' : 'Unpaid'}</button>`}</td><td class="p-4 text-center">${inv.status === 'draft' ? `<div class="flex items-center gap-1 justify-center"><button onclick="window.resumeDraft('${inv.id}')" class="px-2 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 rounded text-xs font-bold transition-colors">Resume</button>${window.isFeatureEnabled('deleteBtn') ? `<button onclick="window.softDeleteInvoice('${inv.id}')" class="p-1.5 text-slate-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>` : `<div class="flex items-center gap-1 justify-center"><button onclick="window.viewInvoice('${inv.id}')" class="px-2 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 rounded text-xs font-bold transition-colors">View</button><button onclick="window.duplicateInvoice('${inv.id}')" title="Duplicate" class="p-1.5 text-slate-400 hover:text-blue-500"><i data-lucide="copy" class="w-4 h-4"></i></button><button onclick="window.shareWhatsApp('${inv.id}')" title="WhatsApp" class="p-1.5 text-slate-400 hover:text-green-500"><i data-lucide="message-circle" class="w-4 h-4"></i></button><button onclick="window.openEditInvoiceModal('${inv.id}')" title="Edit Invoice No/Date" class="p-1.5 text-slate-400 hover:text-emerald-600"><i data-lucide="edit-3" class="w-4 h-4"></i></button><button onclick="window.voidInvoice('${inv.id}')" title="Void" class="p-1.5 text-slate-400 hover:text-red-500"><i data-lucide="ban" class="w-4 h-4"></i></button>${window.isFeatureEnabled('creditNote') ? `<button onclick="window.issueCreditNote('${inv.id}')" title="Credit Note" class="p-1.5 text-slate-400 hover:text-purple-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z"></path></svg></button>`:''}${window.isFeatureEnabled('deleteBtn') ? `<button onclick="window.softDeleteInvoice('${inv.id}')" title="Delete" class="p-1.5 text-slate-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}</div>`}</td></tr>`).join('') || '<tr><td colspan="7" class="p-8 text-center text-slate-400">No records found matching filters.</td></tr>');
+            setHTML('records-list', filtered.map(inv => `<tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors bg-white ${inv.status==='void'?'opacity-50':''}"><td class="p-4 font-mono text-emerald-700 text-sm ${inv.status==='void'?'line-through':''}">${inv.id}</td><td class="p-4 text-xs font-bold text-slate-500 uppercase">${inv.docType || 'Tax Invoice'}</td><td class="p-4 text-slate-600 text-sm whitespace-nowrap">${inv.date}</td><td class="p-4 font-medium text-slate-800 text-sm truncate max-w-[150px]">${inv.client.name}</td><td class="p-4 text-right font-bold ${inv.docType === 'Credit Note' ? 'text-red-600' : 'text-slate-800'} ${inv.status==='void'?'line-through text-slate-400':''}">${window.formatCurrency(inv.grandTotal, inv.currency)}</td><td class="p-4 text-center">${inv.status === 'draft' || inv.docType === 'Credit Note' || inv.status === 'void' ? `<span class="text-[10px] text-slate-400 font-bold uppercase">${inv.status==='void'?'VOID':'N/A'}</span>` : `<button onclick="window.togglePaymentStatus('${inv.id}', '${inv.paymentStatus || 'unpaid'}')" class="text-[10px] uppercase font-bold px-3 py-1.5 rounded-full transition-colors ${inv.paymentStatus === 'paid' ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200 shadow-sm' : 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'}">${inv.paymentStatus === 'paid' ? 'Paid' : 'Unpaid'}</button>`}</td><td class="p-4 text-center">${window.renderRecordActions(inv)}</td></tr>`).join('') || '<tr><td colspan="7" class="p-8 text-center text-slate-400">No records found matching filters.</td></tr>');
             if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
-        window.shareWhatsApp = function(id) {
+        window.shareWhatsApp = async function(id) {
             const inv = window.AppState.invoices.find(i => i.id === id); if(!inv) return;
             const mobile = inv.client.mobile ? inv.client.mobile.replace(/\D/g, '') : '';
-            const text = `Hello ${inv.client.name},\n\nHere is your ${inv.docType || 'Invoice'} (${inv.id}) for amount ${window.formatCurrency(inv.grandTotal, inv.currency)}.\n\nThank you,\n${window.AppState.settings.businessName}`;
-            window.open(`https://wa.me/${mobile ? (mobile.length===10 ? '91'+mobile : mobile) : ''}?text=${encodeURIComponent(text)}`, '_blank');
+            const num = mobile.length === 10 ? '91' + mobile : mobile;
+            const biz = (window.AppState.settings && window.AppState.settings.businessName) || 'My Business';
+            const fmt = window.formatCurrency || function(a){ return '₹' + Number(a).toFixed(2); };
+            const text = `🌿 *${biz}*\n\nHello ${inv.client.name},\n\nYour *${inv.docType || 'Invoice'}* (${inv.id}) is ready.\n📅 Date: ${inv.date}\n💰 Amount: *${fmt(inv.grandTotal, inv.currency)}*\n${inv.paymentStatus === 'paid' ? '✅ Paid' : '⏳ Payment Pending'}\n\nThank you! 🙏`;
+            const waUrl = `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
+
+            // Generate a fresh render element to create PDF from
+            if(typeof html2pdf !== 'undefined' && window.generateInvoiceHTML) {
+                try {
+                    window.showToast && window.showToast('Opening WhatsApp + PDF...');
+                    const freshDiv = document.createElement('div');
+                    freshDiv.style.cssText = 'position:fixed;top:0;left:0;width:794px;min-height:1123px;background:white;font-size:11px;padding:30px 36px;box-sizing:border-box;z-index:9990;overflow:visible;opacity:0.001;pointer-events:none;';
+                    freshDiv.innerHTML = window.generateInvoiceHTML(inv);
+                    document.body.appendChild(freshDiv);
+                    await new Promise(r => setTimeout(r, 400));
+                    const blob = await html2pdf().set({
+                        margin:0, filename: id + '.pdf',
+                        image:{type:'jpeg',quality:0.92},
+                        html2canvas:{scale:2,useCORS:true,logging:false,allowTaint:true,backgroundColor:'#ffffff',windowWidth:794,width:794},
+                        jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+                    }).from(freshDiv).output('blob');
+                    if(freshDiv.parentNode) document.body.removeChild(freshDiv);
+
+                    const file = new File([blob], id + '.pdf', {type:'application/pdf'});
+                    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
+                        await navigator.share({files:[file], text});
+                        window.showToast && window.showToast('Shared! ✅');
+                        return;
+                    }
+                    // Fallback: open WA + download PDF
+                    window.location.href = waUrl;
+                    setTimeout(async function() {
+                        if(window.downloadPDFBlob) await window.downloadPDFBlob(blob, id + '.pdf');
+                        window.showToast && window.showToast('WhatsApp opened + PDF downloading 📎', 'info');
+                    }, 800);
+                    return;
+                } catch(e) { if(e.name === 'AbortError') return; }
+            }
+            // Simple fallback: just open WA with text
+            window.open(waUrl, '_blank');
         }
 
         window.duplicateInvoice = function(id) {
@@ -4618,8 +5305,9 @@ try {
             const startEl = document.getElementById('filter-start'); const start = startEl ? startEl.value : ''; 
             const endEl = document.getElementById('filter-end'); const end = endEl ? endEl.value : ''; 
             const payEl = document.getElementById('filter-payment'); const payStatus = payEl ? payEl.value : '';
+            const clientEl = document.getElementById('filter-client'); const clientFilter = clientEl ? clientEl.value : '';
 
-            const filtered = window.AppState.invoices.filter(i => { return ((i.id||'').toLowerCase().includes(query) || (i.client && i.client.name && i.client.name.toLowerCase().includes(query))) && (start === "" || i.date >= start) && (end === "" || i.date <= end) && (payStatus === "" || (i.paymentStatus || 'unpaid') === payStatus) && i.status === 'final'; });
+            const filtered = window.AppState.invoices.filter(i => { return ((i.id||'').toLowerCase().includes(query) || (i.client && i.client.name && i.client.name.toLowerCase().includes(query))) && (start === "" || i.date >= start) && (end === "" || i.date <= end) && (payStatus === "" || (i.paymentStatus || 'unpaid') === payStatus) && (clientFilter === "" || (i.client && i.client.name === clientFilter)) && i.status === 'final'; });
             if(filtered.length === 0) return window.showToast("No finalized invoices found in current filter.", "warning"); 
             
             const overlay = document.getElementById('pdf-loading-overlay');
@@ -4629,22 +5317,26 @@ try {
             const bulkArea = document.getElementById('bulk-render-area'); 
             
             if(renderContainer && bulkArea) {
-                renderContainer.style.visibility = 'visible'; bulkArea.innerHTML = '';
+                // CRITICAL: must be at top:0,left:0 with opacity near-zero — NOT off-viewport
+                // Android WebView refuses to render elements at left:-9999px
+                renderContainer.style.cssText = 'position:fixed;top:0;left:0;width:794px;background:white;pointer-events:none;z-index:9990;opacity:0.001;overflow:visible;';
+                bulkArea.innerHTML = '';
                 
-                filtered.forEach((inv, idx) => { const wrapper = document.createElement('div'); wrapper.innerHTML = window.generateInvoiceHTML(inv); wrapper.style.cssText = 'page-break-after:always;break-after:page;width:210mm;margin:0 auto;padding:0;box-sizing:border-box;overflow:hidden;background:white;display:block;'; bulkArea.appendChild(wrapper); });
+                filtered.forEach((inv) => { const wrapper = document.createElement('div'); wrapper.innerHTML = window.generateInvoiceHTML(inv); wrapper.style.cssText = 'page-break-after:always;break-after:page;width:794px;margin:0;padding:0;box-sizing:border-box;overflow:hidden;background:white;display:block;'; bulkArea.appendChild(wrapper); });
                 
-                setTimeout(async () => {
-                    try {
-                        const originalScroll = window.scrollY; window.scrollTo(0,0);
-                        await html2pdf().set({ margin: 0, filename: `Bulk_Invoices_${Date.now()}.pdf`, image: { type: 'jpeg', quality: 0.96 }, html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0, allowTaint: true, backgroundColor: '#ffffff', windowWidth: 794, width: 794 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['css','legacy'] } }).from(bulkArea).save();
-                        window.scrollTo(0, originalScroll);
-                        window.showToast("Bulk PDF Downloaded Successfully!");
-                    } catch(e) { window.showToast("Error generating PDF", "error"); } 
-                    finally {
-                        bulkArea.innerHTML = ''; renderContainer.style.visibility = 'hidden'; 
-                        if(overlay) { overlay.classList.add('hidden'); overlay.classList.remove('flex'); }
-                    }
-                }, 1500); 
+                // Wait for images/fonts to render
+                await new Promise(r => setTimeout(r, 800));
+                try {
+                    const originalScroll = window.scrollY; window.scrollTo(0,0);
+                    await html2pdf().set({ margin: 0, filename: `Bulk_Invoices_${new Date().toISOString().split('T')[0]}.pdf`, image: { type: 'jpeg', quality: 0.96 }, html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0, allowTaint: true, backgroundColor: '#ffffff', windowWidth: 794, width: 794 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['css','legacy'] } }).from(bulkArea).save();
+                    window.scrollTo(0, originalScroll);
+                    window.showToast(`Bulk PDF — ${filtered.length} invoice(s) downloaded! ✅`);
+                } catch(e) { window.showToast("Error generating PDF: " + e.message, "error"); } 
+                finally {
+                    bulkArea.innerHTML = '';
+                    renderContainer.style.cssText = 'position:fixed;top:0;left:0;width:794px;background:white;pointer-events:none;z-index:9990;opacity:0.001;overflow:visible;display:none;';
+                    if(overlay) { overlay.classList.add('hidden'); overlay.classList.remove('flex'); }
+                }
             }
         }
 
@@ -4994,7 +5686,7 @@ try {
         window.populateSettingsUI = function() {
             const s = window.AppState.settings;
             // Dynamic app name update — show user's business name everywhere
-            const bizName = s.businessName || 'Dev Ayurveda';
+            const bizName = s.businessName || 'My Business';
             const sidebarName = document.getElementById('sidebar-biz-name'); if(sidebarName) sidebarName.textContent = bizName;
             const topbarTitle = document.getElementById('topbar-biz-name'); if(topbarTitle) topbarTitle.textContent = bizName;
             // Update settings header card
@@ -5384,7 +6076,11 @@ try {
         const taxableAmt = calcBase;
         const taxAmt = calcTax || Number(inv.totalTax) || 0;
         const cgst = Math.round((taxAmt / 2) * 100) / 100;
-        const sgst = Math.round((taxAmt - cgst * 2 + cgst) * 100) / 100; // sgst gets any leftover penny
+        const sgst = Math.round((taxAmt - cgst) * 100) / 100;
+        // Effective GST rate for label — derived from actual totals, not just first item
+        const effectiveGstPct = (taxableAmt > 0 && taxAmt > 0) ? Math.round((taxAmt / taxableAmt) * 100) : (inv.items&&inv.items[0] ? Number(inv.items[0].gst) : 0);
+        const cgstPct = (effectiveGstPct / 2).toFixed(effectiveGstPct % 2 === 0 ? 0 : 1);
+        const sgstPct = cgstPct;
 
         // Determine text color for premium dark template
         const txtColor = (tpl==='premium') ? 'color:#e2e8f0;' : '';
@@ -5433,8 +6129,8 @@ try {
                 <div class="flex justify-end mb-8"><div class="w-80 text-[12px]">
                     <table class="w-full">
                         <tr class="border-b border-slate-100"><td class="py-1.5 text-slate-500">Taxable Amount${window.AppState.settings.taxableExclGST ? ' (excl. GST)' : ''}:</td><td class="py-1.5 text-right font-bold text-slate-800">${window.formatCurrency(window.AppState.settings.taxableExclGST ? taxableAmt : (taxableAmt + taxAmt), curr)}</td></tr>
-                        <tr><td class="py-1 text-slate-400 text-[11px]">CGST (${(Number(inv.totalTax)>0 && inv.items&&inv.items[0] ? Number(inv.items[0].gst)/2 : 0).toFixed(0)}%)</td><td class="py-1 text-right text-slate-400 text-[11px]">${window.formatCurrency(cgst, curr)}</td></tr>
-                        <tr class="border-b border-slate-100"><td class="py-1 pb-2 text-slate-400 text-[11px]">SGST (${(Number(inv.totalTax)>0 && inv.items&&inv.items[0] ? Number(inv.items[0].gst)/2 : 0).toFixed(0)}%)</td><td class="py-1 pb-2 text-right text-slate-400 text-[11px]">${window.formatCurrency(sgst, curr)}</td></tr>
+                        <tr><td class="py-1 text-slate-400 text-[11px]">CGST (${cgstPct}%)</td><td class="py-1 text-right text-slate-400 text-[11px]">${window.formatCurrency(cgst, curr)}</td></tr>
+                        <tr class="border-b border-slate-100"><td class="py-1 pb-2 text-slate-400 text-[11px]">SGST (${sgstPct}%)</td><td class="py-1 pb-2 text-right text-slate-400 text-[11px]">${window.formatCurrency(sgst, curr)}</td></tr>
                         ${inv.discount > 0 ? `<tr class="border-b border-slate-100"><td class="py-1.5 text-emerald-600 font-medium">Discount (${inv.discountType==='percent'?inv.discount+'%':'Flat'}):</td><td class="py-1.5 text-right text-emerald-600 font-medium">- ${window.formatCurrency((Number(inv.subtotal)+Number(inv.totalTax)+Number(inv.tdsAmount||0)-Number(inv.grandTotal)),curr)}</td></tr>` : ''}
                         ${(window.isFeatureEnabled('tds') && inv.tdsAmount > 0) ? `<tr class="border-b border-slate-100"><td class="py-1.5 text-red-600 font-medium">TDS Deducted:</td><td class="py-1.5 text-right text-red-600 font-medium">- ${window.formatCurrency(inv.tdsAmount, curr)}</td></tr>` : ''}
                         <tr class="bg-slate-50 rounded"><td class="py-3 px-2 text-base font-bold text-slate-800 rounded-l">Net Payable:</td><td class="py-3 px-2 text-right text-2xl font-black ${totalStyles} rounded-r">${window.formatCurrency(inv.grandTotal, curr)}</td></tr>
@@ -6657,7 +7353,7 @@ window.sendReminderWA = function(clientId) {
     var unpaidInvs = (window.AppState.invoices||[]).filter(function(i){ return i.client&&i.client.name===client.name && i.paymentStatus!=='paid' && i.status==='final'; });
     if(unpaidInvs.length===0) { window.showToast('No pending dues for this client','info'); return; }
     var total = unpaidInvs.reduce(function(s,i){ return s+Number(i.grandTotal||0); },0);
-    var bizName = (window.AppState.settings&&window.AppState.settings.businessName)||'Dev Ayurveda';
+    var bizName = (window.AppState.settings&&window.AppState.settings.businessName)||'My Business';
     var ids = unpaidInvs.map(function(i){ return i.id; }).join(', ');
     var fmt = function(n){ return '₹'+Number(n).toLocaleString('en-IN',{minimumFractionDigits:2}); };
     var msg = '🌿 *'+bizName+'*\n\nDear '+client.name+',\n\nThis is a friendly reminder regarding your outstanding payment:\n\n📋 Invoice(s): '+ids+'\n💰 Total Due: *'+fmt(total)+'*\n\nKindly arrange payment at your earliest convenience.\n\nThank you for your trust! 🙏';
@@ -6748,7 +7444,7 @@ window.updateBirthdayReminders = function() {
         list.innerHTML = matches.map(function(c){
             var num = (c.mobile||'').replace(/\D/g,'');
             var waNum = num.length===10?'91'+num:num;
-            var msg = '🎂 Happy Birthday '+c.name+'! Wishing you great health and happiness. 🌿\n\n— '+((window.AppState.settings&&window.AppState.settings.businessName)||'Dev Ayurveda');
+            var msg = '🎂 Happy Birthday '+c.name+'! Wishing you great health and happiness. 🌿\n\n— '+((window.AppState.settings&&window.AppState.settings.businessName)||'My Business');
             return '<div class="flex items-center justify-between p-2.5 bg-white rounded-xl border border-pink-100 shadow-sm"><div class="flex items-center gap-2"><div class="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center text-pink-600 font-bold text-sm">'+c.name.charAt(0)+'</div><div><div class="text-sm font-bold text-slate-800">'+c.name+'</div><div class="text-xs text-pink-500">🎂 Birthday Today!</div></div></div><a href="https://wa.me/'+waNum+'?text='+encodeURIComponent(msg)+'" target="_blank" class="btn btn-sm text-xs" style="background:#25D366;color:white;border:none">Wish 🎉</a></div>';
         }).join('');
     } else {
@@ -6791,11 +7487,25 @@ window.updateCashFlowForecast = function() {
 
 // ── FEATURE 10: GST Summary ───────────────────────────────────
 window.updateGSTSummary = function() {
-    var invs = (window.AppState.invoices||[]).filter(function(i){ return i.status==='final'; });
-    var exps = (window.AppState.expenses)||[];
-    var cgst = invs.reduce(function(s,i){ return s+Number(i.totalTax||0)/2; },0);
-    var sgst = cgst;
-    var igst = 0; // simplified
+    // Respect the same date filter as the main dashboard
+    var filterEl = document.getElementById('dash-date-filter');
+    var filter = filterEl ? filterEl.value : 'all';
+    var allInvs = (window.AppState.invoices||[]).filter(function(i){ return i.status==='final'; });
+    var allExps = (window.AppState.expenses)||[];
+    if(filter !== 'all') {
+        var now = new Date();
+        var fm = now.getMonth(), fy = now.getFullYear();
+        if(filter === 'last_month') { fm -= 1; if(fm < 0){ fm = 11; fy -= 1; } }
+        var prefix = fy + '-' + String(fm+1).padStart(2,'0');
+        allInvs = allInvs.filter(function(i){ return i.date && i.date.startsWith(prefix); });
+        allExps = allExps.filter(function(e){ return e.date && e.date.startsWith(prefix); });
+    }
+    var invs = allInvs;
+    var exps = allExps;
+    var totalTax = invs.reduce(function(s,i){ return s+Number(i.totalTax||0); },0);
+    var cgst = Math.round((totalTax/2)*100)/100;
+    var sgst = Math.round((totalTax - cgst)*100)/100;
+    var igst = 0; // IGST not yet supported
     var itc = exps.reduce(function(s,e){ return s+Number(e.gstAmount||0); },0);
     var net = Math.max(0, (cgst+sgst+igst) - itc);
     var fmt = function(n){ return '₹'+Number(n).toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:0}); };
@@ -7255,7 +7965,7 @@ window.generateAIReport = function() {
   if(period.weekRange) exps = exps.filter(function(e){ var d=parseInt(e.date.split('-')[2]); return d>=period.weekRange[0] && d<=period.weekRange[1]; });
   var products = (window.AppState&&window.AppState.products)||[];
   var s = (window.AppState&&window.AppState.settings)||{};
-  var bizName = s.businessName || 'Dev Ayurveda';
+  var bizName = s.businessName || 'My Business';
 
   var rev = invs.reduce(function(sum,i){ return sum+Number(i.grandTotal||0); },0);
   var exp = exps.reduce(function(sum,e){ return sum+Number(e.amount||0); },0);
@@ -7336,7 +8046,7 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;color:#1e293b}
 </head>
 <body>
 <div class="hero">
-  <div class="badge">🌿 Dev Ayurveda ERP · AI Report</div>
+  <div class="badge">🌿 My Business ERP · AI Report</div>
   <h1>${bizName}</h1>
   <p>${period.type === 'weekly' ? 'Weekly' : 'Monthly'} Business Intelligence Report</p>
   <p style="color:#475569;font-size:.78rem;margin-top:8px">Generated: ${now}</p>
@@ -7434,7 +8144,7 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;color:#1e293b}
 </div>
 
 <div class="footer">
-  <p>Generated by <strong>${bizName}</strong> ERP · Dev Ayurveda Pro · ${now}</p>
+  <p>Generated by <strong>${bizName}</strong> ERP · My Business Pro · ${now}</p>
   <p style="margin-top:4px;color:#cbd5e1">This report is confidential and intended for internal business use only.</p>
 </div>
 
@@ -7563,7 +8273,7 @@ window.autoSendWAInvoice = async function() {
     var invs = (window.AppState&&window.AppState.invoices)||[];
     var latest = invs.filter(function(i){ return i.status==='final'; }).sort(function(a,b){ return (b.createdAt||0)-(a.createdAt||0); })[0];
     if(!latest) return;
-    var biz = (window.AppState.settings&&window.AppState.settings.businessName)||'Dev Ayurveda';
+    var biz = (window.AppState.settings&&window.AppState.settings.businessName)||'My Business';
     var fmt = function(n){ return '₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:2}); };
     var msg = '🌿 *'+biz+'*\n\nDear '+latest.client.name+',\n\nYour invoice is ready:\n\n📋 *'+latest.id+'*\n📅 '+latest.date+'\n💰 *'+fmt(latest.grandTotal)+'*\n\n'+(latest.paymentStatus==='paid'?'✅ Paid':'⏳ Payment Pending')+'\n\nThank you! 🙏';
     var mobile = (latest.client&&latest.client.mobile||'').replace(/\D/g,'');
@@ -10005,7 +10715,7 @@ window.applyEmployeeRestrictions = function() {
 // ================================================================
 window.DEMO_DATA = {
     settings: {
-        businessName: 'Dev Ayurveda (Demo)', address: 'Kansi, Darbhanga Bihar 847428',
+        businessName: 'My Business (Demo)', address: 'Kansi, Darbhanga Bihar 847428',
         phone: '7254991801', gstin: '07AABCD1234E1Z5', email: 'demo@devayurveda.in',
         template: 'ayurveda', logoDisplay: 'name', upi: 'devayurveda@upi',
         bankName: 'Punjab National Bank', bankAcc: '6914001700159201', bankIfsc: 'PUNB691400',
@@ -13121,7 +13831,7 @@ console.log('Final fixes loaded ✅');
             var inv = window.AppState && window.AppState.invoices.find(function(i){ return i.id === id; });
             if(!inv) return;
 
-            var biz = (window.AppState.settings && window.AppState.settings.businessName) || 'Dev Ayurveda';
+            var biz = (window.AppState.settings && window.AppState.settings.businessName) || 'My Business';
             var fmt = window.formatCurrency || function(a){ return '₹' + Number(a).toFixed(2); };
             var msg = '🌿 *' + biz + '*\n\nHello ' + (inv.client&&inv.client.name||'') + ','
                 + '\n\n📋 Invoice: *' + inv.id + '*\n📅 Date: ' + inv.date
