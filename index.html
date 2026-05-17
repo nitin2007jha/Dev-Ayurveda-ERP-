@@ -3596,6 +3596,15 @@ document.addEventListener('DOMContentLoaded', function() {
             // Expose for Sheets engine
             window._gRequestToken = _requestToken;
 
+            // ─── SILENT token request — NO popup, only runs if token already exists ───
+            // Used by auto-sync: jab token nahi hoga to silently skip (no redirect, no popup)
+            function _silentRequestToken(cb) {
+                if (_token) { cb(); return; }
+                // Token nahi hai — silently skip, no popup
+                console.log('[AutoSync] Google token not available — skipping silent sync');
+            }
+            window._gSilentRequestToken = _silentRequestToken;
+
             // Drive REST helpers
             async function _driveGet(url) {
                 var r = await fetch(url, { headers: { Authorization: 'Bearer ' + _token } });
@@ -3713,17 +3722,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // ─── MAIN EXPORT: backupToGDrive ──────────────────────────────
-            window.backupToGDrive = function() {
+            // silent=true: no popup, no redirect — used by auto-backup hooks
+            window.backupToGDrive = function(silent) {
                 var cid = window.ERP_CONFIG.googleClientId;
                 if (!cid) {
-                    window.showToast && window.showToast('Set up Google Client ID first — Settings → Google Drive Backup', 'warning');
-                    if (window.openSettingsModal) window.openSettingsModal('gdrive-backup');
+                    if (!silent) {
+                        window.showToast && window.showToast('Set up Google Client ID first — Settings → Google Drive Backup', 'warning');
+                        if (window.openSettingsModal) window.openSettingsModal('gdrive-backup');
+                    }
                     return;
                 }
                 var btn = document.getElementById('gdrive-backup-btn');
                 if (btn) { btn.disabled = true; btn.innerHTML = '<svg class="animate-spin w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Backing up…'; }
 
-                _requestToken(async function() {
+                var tokenFn = silent ? _silentRequestToken : _requestToken;
+                tokenFn(async function() {
                     var bizName = (window.AppState.settings && window.AppState.settings.businessName) || 'MyBusiness';
                     var dateStr = new Date().toISOString().split('T')[0];
                     var fileName = bizName.replace(/\s+/g,'_') + '_backup_' + dateStr + '.json';
@@ -3734,21 +3747,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         await _pruneOldFiles(folderId);
                         localStorage.setItem('ayur_gdrive_last_backup', new Date().toISOString());
                         _logBackup(fileName, true);
-                        window.showToast && window.showToast('✅ Backed up to Google Drive: ' + fileName);
+                        if (!silent) window.showToast && window.showToast('✅ Backed up to Google Drive: ' + fileName);
                     } catch(e) {
                         if (e.message === 'token_expired') {
                             _token = null;
-                            window.showToast && window.showToast('Session expired — tap again to re-authorise', 'warning');
+                            if (!silent) window.showToast && window.showToast('Session expired — tap again to re-authorise', 'warning');
                         } else {
                             _logBackup(fileName||'backup.json', false, e.message);
-                            window.showToast && window.showToast('Drive backup failed: ' + e.message, 'error');
+                            if (!silent) window.showToast && window.showToast('Drive backup failed: ' + e.message, 'error');
                         }
                     } finally {
                         if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 8v8m0-8-3 3m3-3 3 3" stroke="#1a73e8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Backup Now'; }
                     }
                 });
             };
-
             // ─── AUTO DAILY BACKUP ────────────────────────────────────────
             window._checkAutoDriveBackup = function() {
                 var s = window.AppState && window.AppState.settings;
@@ -3924,17 +3936,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // ── MAIN EXPORT ────────────────────────────────────────────────
-            window.syncToGoogleSheets = async function() {
+            window.syncToGoogleSheets = async function(silent) {
                 var s = window.AppState && window.AppState.settings;
                 if (!s || !window.ERP_CONFIG.googleClientId) {
-                    window.showToast && window.showToast('Google Client ID configure karo pehle — Settings → Drive Backup', 'warning');
-                    if (window.openSettingsModal) window.openSettingsModal('gdrive-backup');
+                    if (!silent) {
+                        window.showToast && window.showToast('Google Client ID configure karo pehle — Settings → Drive Backup', 'warning');
+                        if (window.openSettingsModal) window.openSettingsModal('gdrive-backup');
+                    }
                     return;
                 }
 
-                window._gRequestToken(async function() {
+                var tokenFn = silent ? window._gSilentRequestToken : window._gRequestToken;
+                tokenFn(async function() {
                     var ssId = s.sheetsDbId || '';
-                    window.showToast && window.showToast('🔄 Syncing to Google Sheets…', 'info');
+                    if (!silent) window.showToast && window.showToast('🔄 Syncing to Google Sheets…', 'info');
                     var btn = document.getElementById('sheets-sync-btn');
                     if (btn) { btn.disabled = true; btn.textContent = 'Syncing…'; }
 
@@ -3956,7 +3971,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             ssId = created.spreadsheetId;
                             s.sheetsDbId = ssId;
                             if (window.saveAllToLocalStorage) window.saveAllToLocalStorage();
-                            window.showToast && window.showToast('✅ New Google Sheet created!', 'info');
+                            if (!silent) window.showToast && window.showToast('✅ New Google Sheet created!', 'info');
                         } else {
                             // Make sure all tabs exist
                             await _ensureSheets(ssId, ['Summary','Invoices','Products','Clients','Expenses','Stock']);
@@ -3996,21 +4011,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (window.saveAllToLocalStorage) window.saveAllToLocalStorage();
 
                         _updateSheetsUI();
-                        window.showToast && window.showToast('✅ Google Sheet synced! Invoices, Products, Clients, Expenses, Stock updated.', 'success');
+                        if (!silent) window.showToast && window.showToast('✅ Google Sheet synced! Invoices, Products, Clients, Expenses, Stock updated.', 'success');
 
                     } catch(e) {
                         if (e.message === 'token_expired') {
                             window._gAuthToken = null;
-                            window.showToast && window.showToast('Session expired — tap again to re-sign in', 'warning');
+                            if (!silent) window.showToast && window.showToast('Session expired — tap again to re-sign in', 'warning');
                         } else {
-                            window.showToast && window.showToast('Sheets sync failed: ' + e.message, 'error');
+                            if (!silent) window.showToast && window.showToast('Sheets sync failed: ' + e.message, 'error');
                         }
                     } finally {
                         if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Sync Now'; }
                     }
                 });
             };
-
             window.openSheetsInBrowser = function() {
                 var ssId = window.AppState && window.AppState.settings && window.AppState.settings.sheetsDbId;
                 if (!ssId) { window.showToast && window.showToast('Pehle sync karo — Sheet abhi bani nahi', 'warning'); return; }
@@ -4600,12 +4614,50 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch(e) {}
 
             // Firestore listeners — only count NETWORK reads (not cache)
+            // ─── AUTO SYNC ENGINE ─────────────────────────────────────────────────────
+            // Debounced auto-sync: jab bhi koi data change ho (network only), 
+            // 8 seconds baad silently sheets + drive sync trigger hoga
+            var _autoSyncTimer = null;
+            var _autoSyncInProgress = false;
+            window._triggerAutoSync = function() {
+                var s = window.AppState && window.AppState.settings;
+                // Sirf tab sync karo jab sheetsDbId configured ho ya driveBackup on ho
+                var sheetsReady = s && s.sheetsDbId;
+                var driveReady  = s && window.ERP_CONFIG && window.ERP_CONFIG.googleClientId;
+                if (!sheetsReady && !driveReady) return;
+                if (_autoSyncInProgress) return; // Agar sync chal raha hai to skip
+                clearTimeout(_autoSyncTimer);
+                _autoSyncTimer = setTimeout(async function() {
+                    if (_autoSyncInProgress) return;
+                    _autoSyncInProgress = true;
+                    console.log('[AutoSync] Data changed — syncing silently…');
+                    // Update mini indicator
+                    var dot = document.getElementById('sheets-status-dot');
+                    if (dot) dot.className = 'w-2 h-2 rounded-full flex-shrink-0 bg-amber-400 animate-pulse';
+                    try {
+                        if (sheetsReady && window.syncToGoogleSheets) {
+                            await window.syncToGoogleSheets(true); // silent=true
+                        }
+                        if (driveReady && window.backupToGDrive && window._gAuthToken) {
+                            window.backupToGDrive(true); // silent=true, only if already authed
+                        }
+                    } catch(e) {
+                        console.warn('[AutoSync] Error:', e);
+                    } finally {
+                        _autoSyncInProgress = false;
+                        if (window._updateSheetsUI) window._updateSheetsUI();
+                    }
+                }, 8000); // 8 second debounce — data settle hone do
+            };
+            // ──────────────────────────────────────────────────────────────────────────
+
             window.unsubProducts = onSnapshot(collection(db, 'artifacts', appId, 'users', uid, 'products'), (snap) => { 
                 if(window._incReads && !snap.metadata.fromCache) window._incReads(snap.docs.length);
                 const all = snap.docs.map(d => ({id: d.id, ...d.data()})); 
                 window.AppState.products = all.filter(p => !p.isDeleted);
                 window.AppState.deletedProducts = all.filter(p => p.isDeleted);
                 safeLocalSave();
+                if(!snap.metadata.fromCache && window._triggerAutoSync) window._triggerAutoSync();
                 if(window.AppState.activeTab === 'inventory' && window.renderInventory) window.renderInventory();
                 if(window.AppState.activeTab === 'dashboard') window.updateDashboard();
             }, (err) => { console.error("Products Listener Error:", err); window._handleQuotaError(err); });
@@ -4616,6 +4668,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.AppState.clients = all.filter(c => !c.isDeleted);
                 window.AppState.deletedClients = all.filter(c => c.isDeleted);
                 safeLocalSave();
+                if(!snap.metadata.fromCache && window._triggerAutoSync) window._triggerAutoSync();
                 if(window.AppState.activeTab === 'clients') window.renderClients();
             }, (err) => { console.error("Clients Listener Error:", err); window._handleQuotaError(err); });
 
@@ -4625,6 +4678,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.AppState.invoices = all.filter(i => !i.isDeleted);
                 window.AppState.deletedInvoices = all.filter(i => i.isDeleted);
                 safeLocalSave();
+                if(!snap.metadata.fromCache && window._triggerAutoSync) window._triggerAutoSync();
                 if(!window.AppState.draft.id || window.AppState.draft.id.startsWith('INV-')) {
                     window.AppState.draft.id = window.getNextInvoiceId();
                     if(window.AppState.activeTab === 'invoice') window.updateInvoiceUI();
@@ -4641,6 +4695,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.AppState.expenses = all.filter(e => !e.isDeleted);
                 window.AppState.deletedExpenses = all.filter(e => e.isDeleted);
                 safeLocalSave();
+                if(!snap.metadata.fromCache && window._triggerAutoSync) window._triggerAutoSync();
                 if(window.AppState.activeTab === 'expenses') window.renderExpenses();
                 if(window.AppState.activeTab === 'daybook' && window.renderDaybook) window.renderDaybook();
                 if(window.AppState.activeTab === 'dashboard') window.updateDashboard();
